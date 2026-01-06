@@ -33,7 +33,8 @@ with open(file_name, 'r', encoding='utf-8') as file:
             ips[ip] = 1
 
 for ip, count in ips.items():
-    result.append((ip, count))
+    if count > 2 :
+        result.append((ip, count))
 
 result.sort(key=lambda x: x[1], reverse=True)
 
