@@ -3,12 +3,11 @@ import time
 file_name = 'full-logs.sorted.txt'
 result = []
 print("-" * 30)
-print("What name do you want to give to your writed file ?")
-file_to_write = input()
-print("-" * 30)
 print("What IP address do you want to filter by ?")
 ip_to_filter = input()
 print("-" * 30)
+
+file_to_write = ip_to_filter.replace('.', '_')
 
 debut = time.perf_counter()
 
