@@ -23,7 +23,7 @@ with open(file_name, 'r', encoding='utf-8') as file:
         ]
         result.append(clean_line)
 
-with open(file_to_write, 'w', encoding='utf-8') as file:
+with open(file_to_write+".txt", 'w', encoding='utf-8') as file:
     for line in result:
         file.write(str(line) + '\n')
 
