@@ -12,7 +12,6 @@ sqli_patterns = [
 
 regex_sqli = re.compile("|".join(sqli_patterns), re.IGNORECASE)
 
-
 def analyze_logs(file_path):
     success_count = 0
     total_sqli = 0
@@ -38,7 +37,7 @@ def analyze_logs(file_path):
 
                     if is_success:
                         success_count += 1
-                        print(f"\033[92m{prefix} {timestamp:<20} | {ip:<15} | {status} | {request}\033[0m")
+                        print(f"{prefix} {timestamp:<20} | {ip:<15} | {status} | {request}\033[0m")
                     else:
                         pass
 
@@ -48,7 +47,6 @@ def analyze_logs(file_path):
 
     except FileNotFoundError:
         print("Erreur : Le fichier est introuvable.")
-
 
 if __name__ == "__main__":
     analyze_logs(log_file)

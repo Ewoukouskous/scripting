@@ -1,48 +1,53 @@
-import ast
-import time
+import gzip
+import re
 
-file_name = 'logs.txt'
-output_file = 'succesfull_bruteforce.txt'
-pending_sequences = {}
-
+log_file = "full-logs.sorted.txt.gz"
 SEUIL_ALERTE = 5
 
-print(f"Analyse en cours...")
-debut = time.perf_counter()
+pending_sequences = {}
 
-with open(file_name, 'r', encoding='utf-8') as file:
-    for line in file:
-        try:
-            clean_line = line.strip()
-            log_list = ast.literal_eval(clean_line)
-            ip = log_list[0]
-            status = log_list[3]
+LOGIN_PAGES = r"login|admin|manager|wp-login|author|formLogin|config"
 
-            if status == '401':
-                if ip not in pending_sequences:
-                    pending_sequences[ip] = []
-                pending_sequences[ip].append(clean_line)
+def analyze_bruteforce(file_path):
+    total_alerts = 0
 
-            elif status == '200':
-                if ip in pending_sequences and len(pending_sequences[ip]) >= SEUIL_ALERTE:
-                    with open(output_file, 'a', encoding='utf-8') as f_out:
-                        f_out.write(f"--- Bruteforce réussi avec : {ip} ---\n")
-                        for s_line in pending_sequences[ip]:
-                            f_out.write('❌ ' + s_line + "\n")
-                        f_out.write(f"✔️ {clean_line} \n")
-                        f_out.write("-" * 50 + "\n\n")
+    try:
+        with gzip.open(file_path, 'rt', encoding='utf-8', errors='ignore') as f:
+            for line in f:
+                parts = re.split(r'\s(?=(?:[^"]*"[^"]*")*[^"]*$)', line)
+                if len(parts) < 7:
+                    continue
 
-                    print(f"[!] Alerte : Brute force réussi pour l'IP {ip}")
+                ip = parts[0]
+                timestamp = parts[3].strip('[]')
+                request = parts[5].strip('"')
 
-                if ip in pending_sequences:
-                    del pending_sequences[ip]
+                status_match = re.search(r'\s(\d{3})\s', line)
+                if not status_match:
+                    continue
+                status = status_match.group(1)
 
-            else:
-                if ip in pending_sequences:
-                    del pending_sequences[ip]
+                if re.search(LOGIN_PAGES, request, re.IGNORECASE):
 
-        except (SyntaxError, ValueError, IndexError):
-            continue
+                    if status in ['401', '403', '404', '400']:
+                        if ip not in pending_sequences:
+                            pending_sequences[ip] = []
+                        pending_sequences[ip].append(request)
 
-fin = time.perf_counter()
-print(f"\nAnalyse terminée en {fin - debut:.4f}s. Vérifiez '{output_file}'.")
+                    elif status == '200':
+                        if ip in pending_sequences and len(pending_sequences[ip]) >= SEUIL_ALERTE:
+                            total_alerts += 1
+                            print(
+                                f"{ip:<15} | {timestamp} | Succès sur : {request}\033[0m")
+                            print(f"Tentatives infructueuses juste avant : {len(pending_sequences[ip])}")
+
+                            del pending_sequences[ip]
+
+        print(f"{'=' * 100}")
+        print(f"ANALYSE TERMINÉE. Total détecté : {total_alerts}")
+
+    except FileNotFoundError:
+        print(f"Erreur : Le fichier {file_path} est introuvable.")
+
+if __name__ == "__main__":
+    analyze_bruteforce(log_file)
