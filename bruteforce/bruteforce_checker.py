@@ -6,6 +6,7 @@ SEUIL_ALERTE = 5
 
 pending_sequences = {}
 
+# Common login page name
 LOGIN_PAGES = r"login|admin|manager|wp-login|author|formLogin|config"
 
 def analyze_bruteforce(file_path):

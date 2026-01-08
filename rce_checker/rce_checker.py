@@ -3,6 +3,7 @@ import re
 
 log_file = "full-logs.sorted.txt.gz"
 
+# Common rce attacks
 rce_patterns = [
     r"wget", r"curl", r"chmod\+777", r"rm\+-rf", r"sh\+",
     r"eval-stdin\.php",
