@@ -1,0 +1,51 @@
+import gzip
+import re
+
+log_file = "full-logs.sorted.txt.gz"
+
+traversal_patterns = [
+    r"\.\./", r"\.\.%2f", r"%2e%2e%2f", r"\.\.%5c",
+    r"/etc/passwd", r"windows/win\.ini", r"\.env",
+    r"wp-config\.php", r"php://filter", r"/proc/self/environ"
+]
+
+regex_traversal = re.compile("|".join(traversal_patterns), re.IGNORECASE)
+
+def analyze_traversal(file_path):
+    total_found = 0
+    critical_hits = 0
+
+    print(f"{'STATUT':<12} | {'IP':<15} | {'REQUÊTE'}")
+    print("-" * 100)
+
+    try:
+        with gzip.open(file_path, 'rt', encoding='utf-8', errors='ignore') as f:
+            for line in f:
+                parts = re.split(r'\s(?=(?:[^"]*"[^"]*")*[^"]*$)', line)
+                if len(parts) < 7:
+                    continue
+
+                ip = parts[0]
+                request = parts[5].strip('"')
+                status = parts[6]
+
+                if regex_traversal.search(request):
+                    total_found += 1
+                    is_success = status.startswith('2')
+
+                    if is_success:
+                        critical_hits += 1
+                        print(f"\033[92m[CRITIQUE]   | {ip:<15} | {request}\033[0m")
+                    else:
+                        print(f"[TENTATIVE]  | {ip:<15} | {request}")
+
+        print("-" * 100)
+        print(f"ANALYSE PATH TRAVERSAL TERMINÉE")
+        print(f"Total de tentatives détectées : {total_found}")
+        print(f"Accès réussis (Code 200)      : {critical_hits}")
+
+    except FileNotFoundError:
+        print(f"Erreur : Le fichier {file_path} est introuvable.")
+
+if __name__ == "__main__":
+    analyze_traversal(log_file)
