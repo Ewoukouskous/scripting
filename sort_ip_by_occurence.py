@@ -1,6 +1,7 @@
 import time
+import re
 
-file_name = 'full-logs.sorted.txt'
+file_name = 'calt.log'
 result = []
 print("-" * 30)
 print("What name do you want to give to your writed file ?")
@@ -13,20 +14,26 @@ debut = time.perf_counter()
 
 with open(file_name, 'r', encoding='utf-8') as file:
     for line in file:
-        parts = line.split()
+        parts = re.split(r'\s(?=(?:[^"]*"[^"]*")*[^"]*$)', line)
 
         # Clean line exemple :
         # Ip address [0], Date and time [1], Request [2], Status code [3], Size [4], User agent [5]
+        ip = parts[0]
+        date = parts[1]
+        request = parts[2]
+        status_code = parts[3]
+        size = parts[4]
+        user_agent = " ".join(parts[5:])
+
         clean_line = [
-            parts[0],
-            f"{parts[3]} {parts[4]}".strip('[]'),
-            f"{parts[5]} {parts[6]} {parts[7]}".strip('"'),
-            parts[8],
-            parts[9],
-            " ".join(parts[11:]).strip('"')
+            ip,
+            date,
+            request,
+            status_code,
+            size,
+            user_agent
         ]
 
-        ip = clean_line[0]
         if ip in ips:
             ips[ip] += 1
         else:
