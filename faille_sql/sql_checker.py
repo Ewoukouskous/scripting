@@ -47,7 +47,7 @@ def analyze_logs(file_path):
         print(f"Total de tentatives SQLi détectées : {total_sqli}")
 
     except FileNotFoundError:
-        print("Erreur : Le fichier est introuvable.", file=out)
+        print("Erreur : Le fichier est introuvable.")
 
 if __name__ == "__main__":
     analyze_logs(log_file)

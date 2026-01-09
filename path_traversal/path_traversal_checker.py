@@ -44,7 +44,7 @@ def analyze_traversal(file_path):
         print(f"Accès réussis (Code 200)      : {critical_hits}")
 
     except FileNotFoundError:
-        print(f"Erreur : Le fichier {file_path} est introuvable.", file=out)
+        print(f"Erreur : Le fichier {file_path} est introuvable.")
 
 if __name__ == "__main__":
     analyze_traversal(log_file)

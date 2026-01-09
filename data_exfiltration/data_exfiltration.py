@@ -31,7 +31,7 @@ def analyze_exfiltration(file_path):
                     total_suspicious += 1
                     size_kb = round(size / 1024, 2)
 
-                    print(f"[EXFIL]      | {ip:<15} | {size_kb:<12} | {request}", file=out)
+                    print(f"[EXFIL] | {ip:<15} | {size_kb:<12} | {request}", file=out)
                 else:
                     pass
 
@@ -40,7 +40,7 @@ def analyze_exfiltration(file_path):
         print(f"Nombre de transferts volumineux détectés (> {SEUIL_EXFILTRATION / 1000000} Mo) : {total_suspicious}")
 
     except FileNotFoundError:
-        print(f"Erreur : Le fichier {file_path} est introuvable.", file=out)
+        print(f"Erreur : Le fichier {file_path} est introuvable.")
 
 if __name__ == "__main__":
     analyze_exfiltration(log_file)

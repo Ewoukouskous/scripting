@@ -33,12 +33,12 @@ def analyze_xss(file_path):
                     tag = "[SUCCESS]" if is_success else "[ATTEMPT]"
                     if is_success: success_count += 1
 
-                    print(f"{tag:<10} | {ip:<15} | {status} | {request[:80]}...", file=out)
+                    print(f"{tag:<10} | {ip:<15} | {status} | {request}", file=out)
 
         print(f"\n{'=' * 50}\nTOTAL XSS : {total_xss} | RÉUSSIS : {success_count}")
 
     except FileNotFoundError:
-        print(f"Fichier non trouvé : {file_path}", file=out)
+        print(f"Fichier non trouvé : {file_path}")
 
 if __name__ == "__main__":
     analyze_xss(log_file)
