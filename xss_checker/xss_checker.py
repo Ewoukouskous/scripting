@@ -35,7 +35,7 @@ def analyze_xss(file_path):
 
                     print(f"{tag:<10} | {ip:<15} | {status} | {request}", file=out)
 
-        print(f"\n{'=' * 50}\nTOTAL XSS : {total_xss} | RÉUSSIS : {success_count}")
+        print(f"Total de faille xss détectée : {total_xss} | faille réussies : {success_count}")
 
     except FileNotFoundError:
         print(f"Fichier non trouvé : {file_path}")

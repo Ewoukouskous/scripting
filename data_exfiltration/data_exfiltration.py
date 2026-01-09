@@ -3,7 +3,7 @@ import re
 
 log_file = "../calt.log.gz"
 
-SEUIL_EXFILTRATION = 1000000
+LIMITE_EXFIL = 3000000
 
 def analyze_exfiltration(file_path):
     total_suspicious = 0
@@ -18,6 +18,7 @@ def analyze_exfiltration(file_path):
                     continue
 
                 ip = parts[0]
+                timestamp = parts[3].strip('[]')
                 request = parts[5].strip('"')
                 status = parts[6]
                 size_str = parts[7]
@@ -27,17 +28,16 @@ def analyze_exfiltration(file_path):
                 except ValueError:
                     size = 0
 
-                if status == '200' and size > SEUIL_EXFILTRATION:
+                if status == '200' and size > LIMITE_EXFIL:
                     total_suspicious += 1
                     size_kb = round(size / 1024, 2)
 
-                    print(f"[EXFIL] | {ip:<15} | {size_kb:<12} | {request}", file=out)
+                    print(f"[EXFIL] | {timestamp:<22} | {ip:<15} | {size_kb:<12} | {request}", file=out)
                 else:
                     pass
 
-        print("-" * 110)
-        print(f"ANALYSE D'EXFILTRATION TERMINÉE")
-        print(f"Nombre de transferts volumineux détectés (> {SEUIL_EXFILTRATION / 1000000} Mo) : {total_suspicious}")
+        print(f"Analyse d'exfiltration terminée")
+        print(f"Nombre de transferts lourds détectés (> {LIMITE_EXFIL / 1000000} Mo) : {total_suspicious}")
 
     except FileNotFoundError:
         print(f"Erreur : Le fichier {file_path} est introuvable.")

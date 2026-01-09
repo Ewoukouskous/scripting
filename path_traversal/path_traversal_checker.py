@@ -3,7 +3,6 @@ import re
 
 log_file = "../calt.log.gz"
 
-
 traversal_patterns = [
     r"\.\./", r"\.\.%2f", r"%2e%2e%2f", r"\.\.%5c",
     r"/etc/passwd", r"windows/win\.ini", r"\.env",
@@ -34,14 +33,13 @@ def analyze_traversal(file_path):
 
                     if is_success:
                         critical_hits += 1
-                        print(f"\033[92m[CRITIQUE]   | {ip:<15} | {request}\033[0m", file=out)
+                        print(f"[CRITIQUE]   | {ip:<15} | {request}", file=out)
                     else:
                         print(f"[TENTATIVE]  | {ip:<15} | {request}", file=out)
 
-        print("-" * 100)
-        print(f"ANALYSE PATH TRAVERSAL TERMINÉE")
+        print(f"Analyse de path traversal terminée")
         print(f"Total de tentatives détectées : {total_found}")
-        print(f"Accès réussis (Code 200)      : {critical_hits}")
+        print(f"Accès réussis                 : {critical_hits}")
 
     except FileNotFoundError:
         print(f"Erreur : Le fichier {file_path} est introuvable.")

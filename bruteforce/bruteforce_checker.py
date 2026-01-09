@@ -40,12 +40,11 @@ def analyze_bruteforce(file_path):
                         if ip in pending_sequences and len(pending_sequences[ip]) >= SEUIL_ALERTE:
                             total_alerts += 1
                             print(f"{ip:<15} | {timestamp} | Succès sur : {request}", file=out)
-                            print(f"Tentatives infructueuses juste avant : {len(pending_sequences[ip])}", file=out)
+                            print(f"Tentatives ratés juste avant : {len(pending_sequences[ip])}", file=out)
 
                             del pending_sequences[ip]
 
-        print(f"{'=' * 100}")
-        print(f"ANALYSE TERMINÉE. Total détecté : {total_alerts}")
+        print(f"Analyse bruteforce terminée. Total détecté : {total_alerts}")
 
     except FileNotFoundError:
         print(f"Erreur : Le fichier {file_path} est introuvable.")

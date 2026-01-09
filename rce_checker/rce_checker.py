@@ -45,10 +45,9 @@ def analyze_rce(file_path):
                     else:
                         pass
 
-        print(f"{'=' * 100}")
-        print(f"ANALYSE RCE TERMINÉE")
+        print(f"Analyse d'attaque rce terminée")
         print(f"Total de tentatives RCE détectées : {total_rce}")
-        print(f"Tentatives réussies (Status 200) : {success_count}")
+        print(f"Tentatives réussies               : {success_count}")
 
     except FileNotFoundError:
         print(f"Erreur : Le fichier {file_path} est introuvable.")
