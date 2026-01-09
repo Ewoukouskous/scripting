@@ -13,7 +13,8 @@ def analyze_bruteforce(file_path):
     total_alerts = 0
 
     try:
-        with gzip.open(file_path, 'rt', encoding='utf-8', errors='ignore') as f:
+        with gzip.open(file_path, 'rt', encoding='utf-8', errors='ignore') as f, \
+                open("bruteforce_logs.txt", 'w', encoding='utf-8') as out:
             for line in f:
                 parts = re.split(r'\s(?=(?:[^"]*"[^"]*")*[^"]*$)', line)
                 if len(parts) < 7:
@@ -38,9 +39,8 @@ def analyze_bruteforce(file_path):
                     elif status == '200':
                         if ip in pending_sequences and len(pending_sequences[ip]) >= SEUIL_ALERTE:
                             total_alerts += 1
-                            print(
-                                f"{ip:<15} | {timestamp} | Succès sur : {request}\033[0m")
-                            print(f"Tentatives infructueuses juste avant : {len(pending_sequences[ip])}")
+                            print(f"{ip:<15} | {timestamp} | Succès sur : {request}", file=out)
+                            print(f"Tentatives infructueuses juste avant : {len(pending_sequences[ip])}", file=out)
 
                             del pending_sequences[ip]
 
@@ -48,7 +48,7 @@ def analyze_bruteforce(file_path):
         print(f"ANALYSE TERMINÉE. Total détecté : {total_alerts}")
 
     except FileNotFoundError:
-        print(f"Erreur : Le fichier {file_path} est introuvable.")
+        print(f"Erreur : Le fichier {file_path} est introuvable.", file=out)
 
 if __name__ == "__main__":
     analyze_bruteforce(log_file)

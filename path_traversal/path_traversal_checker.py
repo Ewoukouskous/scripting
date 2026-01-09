@@ -16,11 +16,9 @@ def analyze_traversal(file_path):
     total_found = 0
     critical_hits = 0
 
-    print(f"{'STATUT':<12} | {'IP':<15} | {'REQUÊTE'}")
-    print("-" * 100)
-
     try:
-        with gzip.open(file_path, 'rt', encoding='utf-8', errors='ignore') as f:
+        with gzip.open(file_path, 'rt', encoding='utf-8', errors='ignore') as f, \
+                open("path_traversal_logs.txt", 'w', encoding='utf-8') as out:
             for line in f:
                 parts = re.split(r'\s(?=(?:[^"]*"[^"]*")*[^"]*$)', line)
                 if len(parts) < 7:
@@ -36,9 +34,9 @@ def analyze_traversal(file_path):
 
                     if is_success:
                         critical_hits += 1
-                        print(f"\033[92m[CRITIQUE]   | {ip:<15} | {request}\033[0m")
+                        print(f"\033[92m[CRITIQUE]   | {ip:<15} | {request}\033[0m", file=out)
                     else:
-                        print(f"[TENTATIVE]  | {ip:<15} | {request}")
+                        print(f"[TENTATIVE]  | {ip:<15} | {request}", file=out)
 
         print("-" * 100)
         print(f"ANALYSE PATH TRAVERSAL TERMINÉE")
@@ -46,7 +44,7 @@ def analyze_traversal(file_path):
         print(f"Accès réussis (Code 200)      : {critical_hits}")
 
     except FileNotFoundError:
-        print(f"Erreur : Le fichier {file_path} est introuvable.")
+        print(f"Erreur : Le fichier {file_path} est introuvable.", file=out)
 
 if __name__ == "__main__":
     analyze_traversal(log_file)

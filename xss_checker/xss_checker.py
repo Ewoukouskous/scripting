@@ -15,7 +15,8 @@ def analyze_xss(file_path):
     total_xss = 0
 
     try:
-        with gzip.open(file_path, 'rt', encoding='utf-8', errors='ignore') as f:
+        with gzip.open(file_path, 'rt', encoding='utf-8', errors='ignore') as f, \
+                open("xss_detector_logs.txt", 'w', encoding='utf-8') as out:
             for line in f:
                 parts = line.split()
                 if len(parts) < 9: continue
@@ -32,12 +33,12 @@ def analyze_xss(file_path):
                     tag = "[SUCCESS]" if is_success else "[ATTEMPT]"
                     if is_success: success_count += 1
 
-                    print(f"{tag:<10} | {ip:<15} | {status} | {request[:80]}...")
+                    print(f"{tag:<10} | {ip:<15} | {status} | {request[:80]}...", file=out)
 
         print(f"\n{'=' * 50}\nTOTAL XSS : {total_xss} | RÉUSSIS : {success_count}")
 
     except FileNotFoundError:
-        print(f"Fichier non trouvé : {file_path}")
+        print(f"Fichier non trouvé : {file_path}", file=out)
 
 if __name__ == "__main__":
     analyze_xss(log_file)

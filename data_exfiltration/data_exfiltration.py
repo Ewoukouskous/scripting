@@ -9,7 +9,8 @@ def analyze_exfiltration(file_path):
     total_suspicious = 0
 
     try:
-        with gzip.open(file_path, 'rt', encoding='utf-8', errors='ignore') as f:
+        with gzip.open(file_path, 'rt', encoding='utf-8', errors='ignore') as f, \
+                open("data_exfiltration_logs.txt", 'w', encoding='utf-8') as out:
             for line in f:
                 parts = re.split(r'\s(?=(?:[^"]*"[^"]*")*[^"]*$)', line)
 
@@ -30,7 +31,7 @@ def analyze_exfiltration(file_path):
                     total_suspicious += 1
                     size_kb = round(size / 1024, 2)
 
-                    print(f"[EXFIL]      | {ip:<15} | {size_kb:<12} | {request}\033[0m")
+                    print(f"[EXFIL]      | {ip:<15} | {size_kb:<12} | {request}", file=out)
                 else:
                     pass
 
@@ -39,7 +40,7 @@ def analyze_exfiltration(file_path):
         print(f"Nombre de transferts volumineux détectés (> {SEUIL_EXFILTRATION / 1000000} Mo) : {total_suspicious}")
 
     except FileNotFoundError:
-        print(f"Erreur : Le fichier {file_path} est introuvable.")
+        print(f"Erreur : Le fichier {file_path} est introuvable.", file=out)
 
 if __name__ == "__main__":
     analyze_exfiltration(log_file)

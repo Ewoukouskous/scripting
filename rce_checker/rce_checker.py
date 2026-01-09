@@ -19,7 +19,8 @@ def analyze_rce(file_path):
     total_rce = 0
 
     try:
-        with gzip.open(file_path, 'rt', encoding='utf-8', errors='ignore') as f:
+        with gzip.open(file_path, 'rt', encoding='utf-8', errors='ignore') as f, \
+                open("rce_detector_logs.txt", 'w', encoding='utf-8') as out:
             for line in f:
                 parts = re.split(r'\s(?=(?:[^"]*"[^"]*")*[^"]*$)', line)
 
@@ -40,7 +41,7 @@ def analyze_rce(file_path):
 
                     if is_success:
                         success_count += 1
-                        print(f"{prefix:<12} | {timestamp:<22} | {ip:<15} | {status} | {size_str:<5} | {request}")
+                        print(f"{prefix:<12} | {timestamp:<22} | {ip:<15} | {status} | {size_str:<5} | {request}", file=out)
                     else:
                         pass
 
@@ -50,7 +51,7 @@ def analyze_rce(file_path):
         print(f"Tentatives réussies (Status 200) : {success_count}")
 
     except FileNotFoundError:
-        print(f"Erreur : Le fichier {file_path} est introuvable.")
+        print(f"Erreur : Le fichier {file_path} est introuvable.", file=out)
 
 if __name__ == "__main__":
     analyze_rce(log_file)

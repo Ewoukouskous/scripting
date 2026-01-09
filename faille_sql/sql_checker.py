@@ -17,7 +17,8 @@ def analyze_logs(file_path):
     total_sqli = 0
 
     try:
-        with gzip.open(file_path, 'rt', encoding='utf-8', errors='ignore') as f:
+        with gzip.open(file_path, 'rt', encoding='utf-8', errors='ignore') as f, \
+                open("sql_attack_logs.txt", 'w', encoding='utf-8') as out:
             for line in f:
                 parts = re.split(r'\s(?=(?:[^"]*"[^"]*")*[^"]*$)', line)
 
@@ -37,7 +38,7 @@ def analyze_logs(file_path):
 
                     if is_success:
                         success_count += 1
-                        print(f"{prefix} {timestamp:<20} | {ip:<15} | {status} | {request}\033[0m")
+                        print(f"{prefix} {timestamp:<20} | {ip:<15} | {status} | {request}", file=out)
                     else:
                         pass
 
@@ -46,7 +47,7 @@ def analyze_logs(file_path):
         print(f"Total de tentatives SQLi détectées : {total_sqli}")
 
     except FileNotFoundError:
-        print("Erreur : Le fichier est introuvable.")
+        print("Erreur : Le fichier est introuvable.", file=out)
 
 if __name__ == "__main__":
     analyze_logs(log_file)
