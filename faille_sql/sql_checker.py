@@ -35,6 +35,7 @@ def analyze_logs(file_path):
                 timestamp = parts[3].strip('[]')
                 request = parts[5].strip('"')
                 status = parts[6]
+                size_str = parts[7]
 
                 if regex_sqli.search(request) and "?" in request:
                     if regex_exclusions.search(request):
@@ -46,7 +47,7 @@ def analyze_logs(file_path):
 
                     if is_success:
                         success_count += 1
-                        print(f"{prefix} {timestamp:<20} | {ip:<15} | {status} | {request}", file=out)
+                        print(f"{prefix:<12} | {timestamp:<22} | {ip:<15} | {status} | {size_str:<5} | {request}", file=out)
                     else:
                         pass
 

@@ -24,8 +24,10 @@ def analyze_traversal(file_path):
                     continue
 
                 ip = parts[0]
+                timestamp = parts[3].strip('[]')
                 request = parts[5].strip('"')
                 status = parts[6]
+                size_str = parts[7]
 
                 if regex_traversal.search(request):
                     total_found += 1
@@ -33,9 +35,9 @@ def analyze_traversal(file_path):
 
                     if is_success:
                         critical_hits += 1
-                        print(f"[CRITIQUE]   | {ip:<15} | {request}", file=out)
+                        print(f"[CRITIQUE]   | {timestamp:<22} | {ip:<15} | {status} | {size_str:<5} | {request}", file=out)
                     else:
-                        print(f"[TENTATIVE]  | {ip:<15} | {request}", file=out)
+                        print(f"[TENTATIVE]  | {timestamp:<22} | {ip:<15} | {status} | {size_str:<5} | {request}", file=out)
 
         print(f"Analyse de path traversal terminée")
         print(f"Total de tentatives détectées : {total_found}")
