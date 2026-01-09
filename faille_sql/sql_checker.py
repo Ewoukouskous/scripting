@@ -42,9 +42,8 @@ def analyze_logs(file_path):
                     else:
                         pass
 
-        print(f"{'=' * 80}")
-        print(f"Analyse terminée.")
-        print(f"Total de tentatives SQLi détectées : {total_sqli}")
+        print(f"Analyse de faille sql terminée.")
+        print(f"Total de tentatives détectées : {total_sqli}")
 
     except FileNotFoundError:
         print("Erreur : Le fichier est introuvable.")
