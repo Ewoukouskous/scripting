@@ -23,8 +23,6 @@ def analyze_xss(file_path):
 
                 ip = parts[0]
                 timestamp = parts[3].strip('[]')
-                request = parts[5].strip('"')
-                status = parts[6]
                 size_str = parts[7]
 
                 raw_request = " ".join(parts[5:8])
