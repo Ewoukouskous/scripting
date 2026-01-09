@@ -1,7 +1,7 @@
 import gzip
 import re
 
-log_file = "full-logs.sorted.txt.gz"
+log_file = "../calt.log.gz"
 SEUIL_ALERTE = 5
 
 pending_sequences = {}

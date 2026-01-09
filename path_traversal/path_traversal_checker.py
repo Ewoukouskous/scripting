@@ -1,7 +1,8 @@
 import gzip
 import re
 
-log_file = "full-logs.sorted.txt.gz"
+log_file = "../calt.log.gz"
+
 
 traversal_patterns = [
     r"\.\./", r"\.\.%2f", r"%2e%2e%2f", r"\.\.%5c",

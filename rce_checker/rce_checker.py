@@ -1,7 +1,7 @@
 import gzip
 import re
 
-log_file = "full-logs.sorted.txt.gz"
+log_file = "../calt.log.gz"
 
 # Common rce attacks
 rce_patterns = [
@@ -30,6 +30,7 @@ def analyze_rce(file_path):
                 timestamp = parts[3].strip('[]')
                 request = parts[5].strip('"')
                 status = parts[6]
+                size_str = parts[7]
 
                 if regex_rce.search(request):
                     total_rce += 1
@@ -39,7 +40,7 @@ def analyze_rce(file_path):
 
                     if is_success:
                         success_count += 1
-                        print(f"{prefix:<12} | {timestamp:<22} | {ip:<15} | {request}\033[0m")
+                        print(f"{prefix:<12} | {timestamp:<22} | {ip:<15} | {status} | {size_str:<5} | {request}")
                     else:
                         pass
 

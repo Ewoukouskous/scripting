@@ -1,7 +1,7 @@
 import gzip
 import re
 
-log_file = "full-logs.sorted.txt.gz"
+log_file = "../calt.log.gz"
 
 # Common SQLi patterns
 sqli_patterns = [

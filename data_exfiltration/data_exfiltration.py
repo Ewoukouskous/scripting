@@ -1,7 +1,7 @@
 import gzip
 import re
 
-log_file = "full-logs.sorted.txt.gz"
+log_file = "../calt.log.gz"
 
 SEUIL_EXFILTRATION = 1000000
 
@@ -30,7 +30,7 @@ def analyze_exfiltration(file_path):
                     total_suspicious += 1
                     size_kb = round(size / 1024, 2)
 
-                    print(f"\033[92m[EXFIL]      | {ip:<15} | {size_kb:<12} | {request}\033[0m")
+                    print(f"[EXFIL]      | {ip:<15} | {size_kb:<12} | {request}\033[0m")
                 else:
                     pass
 
