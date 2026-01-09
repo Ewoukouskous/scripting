@@ -5,12 +5,18 @@ log_file = "../calt.log.gz"
 
 # Common SQLi patterns
 sqli_patterns = [
-    r"UNION", r"SELECT", r"INSERT", r"UPDATE", r"DELETE", r"DROP",
-    r"ORDER BY", r"GROUP BY", r"SLEEP\(", r"BENCHMARK\(",
-    r"OR 1=1", r"AND 1=1", r"'", r"\"", r"--", r"WAITFOR DELAY"
+    r"(?<!\S)UNION", r"(?<!\S)SELECT", r"(?<!\S)INSERT", r"(?<!\S)UPDATE", r"(?<!\S)DELETE", r"(?<!\S)DROP",
+    r"(?<!\S)ORDER BY", r"(?<!\S)GROUP BY", r"(?<!\S)SLEEP\(", r"BENCHMARK\(",
+    r"OR 1=1", r"AND 1=1", r"'", r"\"", r"--", r"(?<!\S)WAITFOR DELAY"
+]
+
+exclusions = [
+    r"\.(?:css|js|png|jpg|jpeg|gif|ico|woff|ttf)(?:\?|$)",
+    r"application/json",
 ]
 
 regex_sqli = re.compile("|".join(sqli_patterns), re.IGNORECASE)
+regex_exclusions = re.compile("|".join(exclusions), re.IGNORECASE)
 
 def analyze_logs(file_path):
     success_count = 0
@@ -30,7 +36,9 @@ def analyze_logs(file_path):
                 request = parts[5].strip('"')
                 status = parts[6]
 
-                if regex_sqli.search(request):
+                if regex_sqli.search(request) and "?" in request:
+                    if regex_exclusions.search(request):
+                        continue
                     total_sqli += 1
 
                     is_success = status.startswith('2')
