@@ -32,7 +32,7 @@ def analyze_exfiltration(file_path):
                     total_suspicious += 1
                     size_kb = round(size / 1024, 2)
 
-                    print(f"[EXFIL] | {timestamp:<22} | {ip:<15} | {size_kb:<12} | {request}", file=out)
+                    print(f"[EXFIL] | {timestamp:<22} | {ip:<15} | {status} | {size_kb:<12} | {request}", file=out)
                 else:
                     pass
 

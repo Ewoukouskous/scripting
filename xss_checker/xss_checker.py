@@ -38,7 +38,7 @@ def analyze_xss(file_path):
                     tag = "[SUCCESS]" if is_success else "[ATTEMPT]"
                     if is_success: success_count += 1
 
-                    print(f"{tag:<10} | {ip:<15} | {status} | {request}", file=out)
+                    print(f"{tag:<12} | {timestamp:<22} | {ip:<15} | {status} | {size_str:<5} | {request}", file=out)
 
         print(f"Total de faille xss détectée : {total_xss} | faille réussies : {success_count}")
 

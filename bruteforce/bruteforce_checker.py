@@ -23,6 +23,7 @@ def analyze_bruteforce(file_path):
                 ip = parts[0]
                 timestamp = parts[3].strip('[]')
                 request = parts[5].strip('"')
+                size_str = parts[7]
 
                 status_match = re.search(r'\s(\d{3})\s', line)
                 if not status_match:
@@ -39,7 +40,7 @@ def analyze_bruteforce(file_path):
                     elif status == '200':
                         if ip in pending_sequences and len(pending_sequences[ip]) >= SEUIL_ALERTE:
                             total_alerts += 1
-                            print(f"{ip:<15} | {timestamp} | Succès sur : {request}", file=out)
+                            print(f"{ip:<15} | {timestamp} | {size_str:<5}  | Succès sur : {request}", file=out)
                             print(f"Tentatives ratés juste avant : {len(pending_sequences[ip])}", file=out)
 
                             del pending_sequences[ip]
