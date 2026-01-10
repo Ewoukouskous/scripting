@@ -74,7 +74,7 @@ def print_ascii_art():
 {Colors.BOLD}{Colors.GREEN1}  ╩═╝╚═╝╚═╝  {Colors.GREEN2}╚  ╚═╝╩╚═╚═╝╝╚╝{Colors.GREEN3}╚═╝╝╚╝╩ ╩╩ ╩╚═╝
 {Colors.RESET}
 {Colors.GREEN3}═══════════════════════════════════════════════════════════════
-{Colors.GREEN4}        Outil de Forensic pour l'Analyse de Logs Web
+{Colors.GREEN4}        Outil de Forensic pour l'Analyse de Logs Apache
 {Colors.GREEN3}═══════════════════════════════════════════════════════════════
 {Colors.RESET}
 """
