@@ -1,7 +1,8 @@
 import time
 import re
+import sys
 
-file_name = 'calt.log'
+file_name = sys.argv[1] if len(sys.argv) > 1 else 'calt.log'
 result = []
 print("-" * 30)
 print("What name do you want to give to your writed file ?")

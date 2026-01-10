@@ -1,6 +1,7 @@
 import time
+import sys
 
-file_name = 'full-logs.sorted.txt'
+file_name = sys.argv[1] if len(sys.argv) > 1 else 'full-logs.sorted.txt'
 result = []
 print("-" * 30)
 print("What name do you want to give to your writed file ?")

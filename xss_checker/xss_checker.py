@@ -1,6 +1,7 @@
 import gzip
 import re
 import urllib.parse
+import sys
 
 log_file = "../calt.log.gz"
 
@@ -44,4 +45,5 @@ def analyze_xss(file_path):
         print(f"Fichier non trouvé : {file_path}")
 
 if __name__ == "__main__":
-    analyze_xss(log_file)
+    file_to_analyze = sys.argv[1] if len(sys.argv) > 1 else log_file
+    analyze_xss(file_to_analyze)

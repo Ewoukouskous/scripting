@@ -1,5 +1,6 @@
 import gzip
 import re
+import sys
 
 log_file = "../calt.log.gz"
 
@@ -47,4 +48,5 @@ def analyze_traversal(file_path):
         print(f"Erreur : Le fichier {file_path} est introuvable.")
 
 if __name__ == "__main__":
-    analyze_traversal(log_file)
+    file_to_analyze = sys.argv[1] if len(sys.argv) > 1 else log_file
+    analyze_traversal(file_to_analyze)

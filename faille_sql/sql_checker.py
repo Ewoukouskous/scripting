@@ -1,5 +1,6 @@
 import gzip
 import re
+import sys
 
 log_file = "../calt.log.gz"
 
@@ -58,4 +59,5 @@ def analyze_logs(file_path):
         print("Erreur : Le fichier est introuvable.")
 
 if __name__ == "__main__":
-    analyze_logs(log_file)
+    file_to_analyze = sys.argv[1] if len(sys.argv) > 1 else log_file
+    analyze_logs(file_to_analyze)
