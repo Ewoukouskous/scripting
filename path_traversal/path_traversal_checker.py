@@ -14,6 +14,11 @@ traversal_patterns = [
 regex_traversal = re.compile("|".join(traversal_patterns), re.IGNORECASE)
 
 def analyze_traversal(file_path):
+    full_logs = False
+    print("Souhaitez vous l'intégralité des tentatives de path traversal découverte ? (SUSPECTE et REUSSIES) [o/N] :")
+    choice = input().strip().lower()
+    if choice == 'o':
+        full_logs = True
     total_found = 0
     critical_hits = 0
     output_file = "path_traversal_logs.txt"
@@ -35,12 +40,13 @@ def analyze_traversal(file_path):
                 if regex_traversal.search(request):
                     total_found += 1
                     is_success = status.startswith('2')
+                    prefix = "[REUSSIE]" if is_success else "[SUSPECT/TENTATIVE]"
 
                     if is_success:
                         critical_hits += 1
-                        print(f"[CRITIQUE]   | {timestamp:<22} | {ip:<15} | {status} | {size_str:<5} | {request}", file=out)
-                    else:
-                        print(f"[TENTATIVE]  | {timestamp:<22} | {ip:<15} | {status} | {size_str:<5} | {request}", file=out)
+                        print(f"{prefix:<20} | {timestamp:<22} | {ip:<15} | {status} | {size_str:<5} | {request}", file=out)
+                    elif full_logs:
+                        print(f"{prefix:<20} | {timestamp:<22} | {ip:<15} | {status} | {size_str:<5} | {request}", file=out)
 
         print(f"Analyse de path traversal terminée")
         print(f"Total de tentatives détectées : {total_found}")
