@@ -1,5 +1,7 @@
 import time
 import sys
+import os
+import gzip
 
 file_name = sys.argv[1] if len(sys.argv) > 1 else 'full-logs.sorted.txt'
 result = []
@@ -8,6 +10,12 @@ print("What name do you want to give to your writed file ?")
 file_to_write = input()
 print("-" * 30)
 
+script_dir = os.path.dirname(os.path.abspath(__file__))
+results_dir = os.path.join(script_dir, 'results')
+if not os.path.exists(results_dir):
+    os.makedirs(results_dir)
+
+output_file = os.path.join(results_dir, f"{file_to_write}.txt")
 
 conventionnal_useragent = [
     "Safari",
@@ -22,12 +30,29 @@ conventionnal_useragent = [
 
 debut = time.perf_counter()
 
-with open(file_name, 'r', encoding='utf-8') as file:
-    for line in file:
+# Essayer gzip d'abord, puis fichier texte avec gestion robuste des erreurs
+file_handle = None
+is_gzip = False
+
+try:
+    file_handle = gzip.open(file_name, 'rt', encoding='utf-8', errors='ignore')
+    # Tester si c'est vraiment un gzip en lisant une ligne
+    file_handle.readline()
+    file_handle.seek(0)
+    is_gzip = True
+except (gzip.BadGzipFile, OSError):
+    pass
+
+if not is_gzip:
+    file_handle = open(file_name, 'r', encoding='utf-8', errors='ignore')
+
+try:
+    for line in file_handle:
         parts = line.split()
 
-        # Clean line exemple :
-        # Ip address [0], Date and time [1], Request [2], Status code [3], Size [4], User agent [5]
+        if len(parts) < 12:
+            continue
+
         clean_line = [
             parts[0],
             f"{parts[3]} {parts[4]}".strip('[]'),
@@ -38,8 +63,11 @@ with open(file_name, 'r', encoding='utf-8') as file:
         ]
         if not any(useragent.lower() in clean_line[5].lower() for useragent in conventionnal_useragent):
             result.append(clean_line)
+finally:
+    if file_handle:
+        file_handle.close()
 
-with open(file_to_write+".txt", 'w', encoding='utf-8') as file:
+with open(output_file, 'w', encoding='utf-8') as file:
     for line in result:
         file.write(str(line) + '\n')
 
@@ -52,4 +80,5 @@ print("-" * 30)
 print(f"Formatage terminé !")
 print(f"Logs écrit   : {nombre_logs}")
 print(f"Temps écoulé   : {duree:.4f} secondes")
+print(f"Résultats sauvegardés dans : {os.path.abspath(output_file)}")
 print("-" * 30)

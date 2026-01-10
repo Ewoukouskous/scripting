@@ -116,6 +116,25 @@ def get_log_file():
             print(f"{Colors.GREEN5}[!] Arrêt du programme.{Colors.RESET}")
             sys.exit(0)
 
+
+def ask_display_mode():
+    """Demande à l'utilisateur s'il veut voir tous les logs ou uniquement les réussites"""
+    print(f"\n{Colors.GREEN2}╔═══════════════════════════════════════════════════════════════╗{Colors.RESET}")
+    print(f"{Colors.GREEN2}║           {Colors.BOLD}TYPE D'AFFICHAGE DES RÉSULTATS{Colors.RESET}{Colors.GREEN2}                      ║{Colors.RESET}")
+    print(f"{Colors.GREEN2}╠═══════════════════════════════════════════════════════════════╣{Colors.RESET}")
+    print(f"{Colors.GREEN2}║                                                               ║{Colors.RESET}")
+    print(f"{Colors.GREEN2}║  {Colors.GREEN1}[1]{Colors.GREEN3} Afficher tous les logs (tentatives + réussites)          ║{Colors.RESET}")
+    print(f"{Colors.GREEN2}║  {Colors.GREEN1}[2]{Colors.GREEN3} Afficher uniquement les réussites                        ║{Colors.RESET}")
+    print(f"{Colors.GREEN2}║                                                               ║{Colors.RESET}")
+    print(f"{Colors.GREEN2}╚═══════════════════════════════════════════════════════════════╝{Colors.RESET}")
+
+    while True:
+        choice = input(f"{Colors.GREEN2}[>] Votre choix: {Colors.RESET}").strip()
+        if choice in ['1', '2']:
+            return 'all' if choice == '1' else 'success'
+        print(f"{Colors.GREEN5}[!] Choix invalide. Veuillez entrer 1 ou 2.{Colors.RESET}")
+
+
 def display_menu():
     menu = f"""
 {Colors.GREEN2}╔═══════════════════════════════════════════════════════════════╗
@@ -141,8 +160,11 @@ def display_menu():
 """
     print(menu)
 
-def run_script(script_name, log_file):
+def run_script(script_name, log_file, display_mode=None):
     print(f"\n{Colors.GREEN3}[*] Exécution de {script_name}...{Colors.RESET}\n")
+
+    if display_mode is None and any(x in script_name for x in ['bruteforce', 'sql', 'path_traversal', 'xss', 'rce', 'data_exfiltration']):
+        display_mode = ask_display_mode()
 
     script_dir = os.path.dirname(os.path.abspath(__file__))
     full_script_path = os.path.join(script_dir, script_name)
@@ -152,8 +174,13 @@ def run_script(script_name, log_file):
         spinner.start()
 
         try:
+            user_input = None
+            if display_mode:
+                user_input = 'o\n' if display_mode == 'all' else '\n'
+
             result = subprocess.run(
                 ["python", full_script_path, log_file],
+                input=user_input,
                 capture_output=True,
                 text=True,
                 encoding='utf-8',
@@ -175,6 +202,24 @@ def run_script(script_name, log_file):
 
     input(f"\n{Colors.GREEN4}Appuyez sur Entrée pour continuer...{Colors.RESET}")
 
+
+def run_interactive_script(script_name, log_file):
+    """Exécute un script qui nécessite une interaction utilisateur (sans subprocess)"""
+    print(f"\n{Colors.GREEN3}[*] Exécution de {script_name}...{Colors.RESET}\n")
+
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    full_script_path = os.path.join(script_dir, script_name)
+
+    if os.path.exists(full_script_path):
+        # Exécuter directement avec os.system pour permettre l'interaction
+        command = f'python "{full_script_path}" "{log_file}"'
+        os.system(command)
+    else:
+        print(f"{Colors.GREEN5}[!] Script non trouvé: {script_name}{Colors.RESET}")
+
+    input(f"\n{Colors.GREEN4}Appuyez sur Entrée pour continuer...{Colors.RESET}")
+
+
 def run_all_analysis(log_file):
     scripts = [
         ("bruteforce/bruteforce_checker.py", "Bruteforce"),
@@ -186,6 +231,10 @@ def run_all_analysis(log_file):
     ]
 
     print(f"\n{Colors.GREEN2}[*] Démarrage de l'analyse complète...{Colors.RESET}\n")
+
+    display_mode = ask_display_mode()
+
+    user_input = 'o\n' if display_mode == 'all' else '\n'
 
     script_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -202,6 +251,7 @@ def run_all_analysis(log_file):
             try:
                 result = subprocess.run(
                     ["python", full_script_path, log_file],
+                    input=user_input,
                     capture_output=True,
                     text=True,
                     encoding='utf-8',
@@ -230,6 +280,12 @@ def main():
     if os.name == 'nt':
         os.system('')
 
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    results_dir = os.path.join(script_dir, 'results')
+    if not os.path.exists(results_dir):
+        os.makedirs(results_dir)
+        print(f"{Colors.GREEN2}[✓] Dossier 'results' créé pour les fichiers de sortie{Colors.RESET}\n")
+
     clear_screen()
     print_ascii_art()
 
@@ -256,11 +312,11 @@ def main():
         elif choice == '6':
             run_script("data_exfiltration/data_exfiltration.py", log_file)
         elif choice == '7':
-            run_script("filter_by_ip.py", log_file)
+            run_interactive_script("filter_by_ip.py", log_file)
         elif choice == '8':
-            run_script("sort_ip_by_occurence.py", log_file)
+            run_interactive_script("sort_ip_by_occurence.py", log_file)
         elif choice == '9':
-            run_script("filter_unconventionnal_useragents.py", log_file)
+            run_interactive_script("filter_unconventionnal_useragents.py", log_file)
         elif choice == 'A':
             run_all_analysis(log_file)
         elif choice == '0':

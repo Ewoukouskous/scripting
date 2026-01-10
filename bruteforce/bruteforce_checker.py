@@ -13,7 +13,13 @@ LOGIN_PAGES = r"login|admin|manager|wp-login|author|formLogin|config"
 
 def analyze_bruteforce(file_path):
     total_alerts = 0
-    output_file = "bruteforce_logs.txt"
+
+    script_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    results_dir = os.path.join(script_root, 'results')
+    if not os.path.exists(results_dir):
+        os.makedirs(results_dir)
+
+    output_file = os.path.join(results_dir, "bruteforce_logs.txt")
 
     try:
         with gzip.open(file_path, 'rt', encoding='utf-8', errors='ignore') as f, \

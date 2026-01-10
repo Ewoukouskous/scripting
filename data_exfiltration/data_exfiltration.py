@@ -9,7 +9,13 @@ LIMITE_EXFIL = 3000000
 
 def analyze_exfiltration(file_path):
     total_suspicious = 0
-    output_file = "data_exfiltration_logs.txt"
+
+    script_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    results_dir = os.path.join(script_root, 'results')
+    if not os.path.exists(results_dir):
+        os.makedirs(results_dir)
+
+    output_file = os.path.join(results_dir, "data_exfiltration_logs.txt")
 
     try:
         with gzip.open(file_path, 'rt', encoding='utf-8', errors='ignore') as f, \

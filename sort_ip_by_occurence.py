@@ -1,6 +1,8 @@
 import time
 import re
 import sys
+import os
+import gzip
 
 file_name = sys.argv[1] if len(sys.argv) > 1 else 'calt.log'
 result = []
@@ -9,36 +11,49 @@ print("What name do you want to give to your writed file ?")
 file_to_write = input()
 print("-" * 30)
 
+script_dir = os.path.dirname(os.path.abspath(__file__))
+results_dir = os.path.join(script_dir, 'results')
+if not os.path.exists(results_dir):
+    os.makedirs(results_dir)
+
+output_file = os.path.join(results_dir, f"{file_to_write}.txt")
+
 ips = {}
 
 debut = time.perf_counter()
 
-with open(file_name, 'r', encoding='utf-8') as file:
-    for line in file:
+# Essayer gzip d'abord, puis fichier texte avec gestion robuste des erreurs
+file_handle = None
+is_gzip = False
+
+try:
+    file_handle = gzip.open(file_name, 'rt', encoding='utf-8', errors='ignore')
+    # Tester si c'est vraiment un gzip en lisant une ligne
+    file_handle.readline()
+    file_handle.seek(0)
+    is_gzip = True
+except (gzip.BadGzipFile, OSError):
+    pass
+
+if not is_gzip:
+    file_handle = open(file_name, 'r', encoding='utf-8', errors='ignore')
+
+try:
+    for line in file_handle:
         parts = re.split(r'\s(?=(?:[^"]*"[^"]*")*[^"]*$)', line)
 
-        # Clean line exemple :
-        # Ip address [0], Date and time [1], Request [2], Status code [3], Size [4], User agent [5]
-        ip = parts[0]
-        date = parts[1]
-        request = parts[2]
-        status_code = parts[3]
-        size = parts[4]
-        user_agent = " ".join(parts[5:])
+        if len(parts) < 1:
+            continue
 
-        clean_line = [
-            ip,
-            date,
-            request,
-            status_code,
-            size,
-            user_agent
-        ]
+        ip = parts[0]
 
         if ip in ips:
             ips[ip] += 1
         else:
             ips[ip] = 1
+finally:
+    if file_handle:
+        file_handle.close()
 
 for ip, count in ips.items():
     if count > 2 :
@@ -47,7 +62,7 @@ for ip, count in ips.items():
 result.sort(key=lambda x: x[1], reverse=True)
 
 
-with open(file_to_write+".txt", 'w', encoding='utf-8') as file:
+with open(output_file, 'w', encoding='utf-8') as file:
     for line in result:
         file.write(str(line) + '\n')
 
@@ -60,4 +75,5 @@ print("-" * 30)
 print(f"Formatage terminé !")
 print(f"Logs écrit   : {nombre_logs}")
 print(f"Temps écoulé   : {duree:.4f} secondes")
+print(f"Résultats sauvegardés dans : {os.path.abspath(output_file)}")
 print("-" * 30)

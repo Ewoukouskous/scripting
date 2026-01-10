@@ -15,7 +15,13 @@ regex_xss = re.compile("|".join(xss_patterns), re.IGNORECASE)
 def analyze_xss(file_path):
     success_count = 0
     total_xss = 0
-    output_file = "xss_detector_logs.txt"
+
+    script_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    results_dir = os.path.join(script_root, 'results')
+    if not os.path.exists(results_dir):
+        os.makedirs(results_dir)
+
+    output_file = os.path.join(results_dir, "xss_detector_logs.txt")
 
     try:
         with gzip.open(file_path, 'rt', encoding='utf-8', errors='ignore') as f, \

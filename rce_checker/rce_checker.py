@@ -24,7 +24,13 @@ def analyze_rce(file_path):
         full_logs = True
     success_count = 0
     total_rce = 0
-    output_file = "rce_detector_logs.txt"
+
+    script_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    results_dir = os.path.join(script_root, 'results')
+    if not os.path.exists(results_dir):
+        os.makedirs(results_dir)
+
+    output_file = os.path.join(results_dir, "rce_detector_logs.txt")
 
     try:
         with gzip.open(file_path, 'rt', encoding='utf-8', errors='ignore') as f, \

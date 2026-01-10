@@ -21,7 +21,13 @@ def analyze_traversal(file_path):
         full_logs = True
     total_found = 0
     critical_hits = 0
-    output_file = "path_traversal_logs.txt"
+
+    script_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    results_dir = os.path.join(script_root, 'results')
+    if not os.path.exists(results_dir):
+        os.makedirs(results_dir)
+
+    output_file = os.path.join(results_dir, "path_traversal_logs.txt")
 
     try:
         with gzip.open(file_path, 'rt', encoding='utf-8', errors='ignore') as f, \
