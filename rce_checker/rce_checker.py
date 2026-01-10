@@ -1,6 +1,7 @@
 import gzip
 import re
 import sys
+import os
 
 log_file = "../calt.log.gz"
 
@@ -18,10 +19,11 @@ regex_rce = re.compile("|".join(rce_patterns), re.IGNORECASE)
 def analyze_rce(file_path):
     success_count = 0
     total_rce = 0
+    output_file = "rce_detector_logs.txt"
 
     try:
         with gzip.open(file_path, 'rt', encoding='utf-8', errors='ignore') as f, \
-                open("rce_detector_logs.txt", 'w', encoding='utf-8') as out:
+                open(output_file, 'w', encoding='utf-8') as out:
             for line in f:
                 parts = re.split(r'\s(?=(?:[^"]*"[^"]*")*[^"]*$)', line)
 
@@ -49,6 +51,8 @@ def analyze_rce(file_path):
         print(f"Analyse d'attaque rce terminée")
         print(f"Total de tentatives RCE détectées : {total_rce}")
         print(f"Tentatives réussies               : {success_count}")
+        output_path = os.path.abspath(output_file)
+        print(f"Résultats sauvegardés dans : {output_path}")
 
     except FileNotFoundError:
         print(f"Erreur : Le fichier {file_path} est introuvable.")

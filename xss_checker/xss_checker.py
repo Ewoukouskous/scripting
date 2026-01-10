@@ -2,6 +2,7 @@ import gzip
 import re
 import urllib.parse
 import sys
+import os
 
 log_file = "../calt.log.gz"
 
@@ -14,10 +15,11 @@ regex_xss = re.compile("|".join(xss_patterns), re.IGNORECASE)
 def analyze_xss(file_path):
     success_count = 0
     total_xss = 0
+    output_file = "xss_detector_logs.txt"
 
     try:
         with gzip.open(file_path, 'rt', encoding='utf-8', errors='ignore') as f, \
-                open("xss_detector_logs.txt", 'w', encoding='utf-8') as out:
+                open(output_file, 'w', encoding='utf-8') as out:
             for line in f:
                 parts = line.split()
                 if len(parts) < 9: continue
@@ -40,6 +42,8 @@ def analyze_xss(file_path):
                     print(f"{tag:<12} | {timestamp:<22} | {ip:<15} | {status} | {size_str:<5} | {request}", file=out)
 
         print(f"Total de faille xss détectée : {total_xss} | faille réussies : {success_count}")
+        output_path = os.path.abspath(output_file)
+        print(f"Résultats sauvegardés dans : {output_path}")
 
     except FileNotFoundError:
         print(f"Fichier non trouvé : {file_path}")

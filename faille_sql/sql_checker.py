@@ -1,6 +1,7 @@
 import gzip
 import re
 import sys
+import os
 
 log_file = "../calt.log.gz"
 
@@ -22,10 +23,11 @@ regex_exclusions = re.compile("|".join(exclusions), re.IGNORECASE)
 def analyze_logs(file_path):
     success_count = 0
     total_sqli = 0
+    output_file = "sql_attack_logs.txt"
 
     try:
         with gzip.open(file_path, 'rt', encoding='utf-8', errors='ignore') as f, \
-                open("sql_attack_logs.txt", 'w', encoding='utf-8') as out:
+                open(output_file, 'w', encoding='utf-8') as out:
             for line in f:
                 parts = re.split(r'\s(?=(?:[^"]*"[^"]*")*[^"]*$)', line)
 
@@ -54,6 +56,8 @@ def analyze_logs(file_path):
 
         print(f"Analyse de faille sql terminée.")
         print(f"Total de tentatives détectées : {total_sqli}")
+        output_path = os.path.abspath(output_file)
+        print(f"Résultats sauvegardés dans : {output_path}")
 
     except FileNotFoundError:
         print("Erreur : Le fichier est introuvable.")

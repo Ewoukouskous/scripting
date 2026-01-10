@@ -1,6 +1,7 @@
 import gzip
 import re
 import sys
+import os
 
 log_file = "../calt.log.gz"
 
@@ -15,10 +16,11 @@ regex_traversal = re.compile("|".join(traversal_patterns), re.IGNORECASE)
 def analyze_traversal(file_path):
     total_found = 0
     critical_hits = 0
+    output_file = "path_traversal_logs.txt"
 
     try:
         with gzip.open(file_path, 'rt', encoding='utf-8', errors='ignore') as f, \
-                open("path_traversal_logs.txt", 'w', encoding='utf-8') as out:
+                open(output_file, 'w', encoding='utf-8') as out:
             for line in f:
                 parts = re.split(r'\s(?=(?:[^"]*"[^"]*")*[^"]*$)', line)
                 if len(parts) < 7:
@@ -43,6 +45,8 @@ def analyze_traversal(file_path):
         print(f"Analyse de path traversal terminée")
         print(f"Total de tentatives détectées : {total_found}")
         print(f"Accès réussis                 : {critical_hits}")
+        output_path = os.path.abspath(output_file)
+        print(f"Résultats sauvegardés dans : {output_path}")
 
     except FileNotFoundError:
         print(f"Erreur : Le fichier {file_path} est introuvable.")

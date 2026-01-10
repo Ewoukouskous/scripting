@@ -1,6 +1,7 @@
 import gzip
 import re
 import sys
+import os
 
 log_file = "../calt.log.gz"
 SEUIL_ALERTE = 5
@@ -12,10 +13,11 @@ LOGIN_PAGES = r"login|admin|manager|wp-login|author|formLogin|config"
 
 def analyze_bruteforce(file_path):
     total_alerts = 0
+    output_file = "bruteforce_logs.txt"
 
     try:
         with gzip.open(file_path, 'rt', encoding='utf-8', errors='ignore') as f, \
-                open("bruteforce_logs.txt", 'w', encoding='utf-8') as out:
+                open(output_file, 'w', encoding='utf-8') as out:
             for line in f:
                 parts = re.split(r'\s(?=(?:[^"]*"[^"]*")*[^"]*$)', line)
                 if len(parts) < 7:
@@ -47,6 +49,8 @@ def analyze_bruteforce(file_path):
                             del pending_sequences[ip]
 
         print(f"Analyse bruteforce terminée. Total détecté : {total_alerts}")
+        output_path = os.path.abspath(output_file)
+        print(f"Résultats sauvegardés dans : {output_path}")
 
     except FileNotFoundError:
         print(f"Erreur : Le fichier {file_path} est introuvable.")

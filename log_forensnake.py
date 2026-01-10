@@ -1,6 +1,9 @@
 import os
 import sys
 import io
+import subprocess
+import threading
+import time
 
 if sys.platform == 'win32':
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
@@ -17,6 +20,40 @@ class Colors:
 
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
+
+
+class Spinner:
+    """Animation de barre tournante pendant l'exécution des scripts"""
+    def __init__(self, message="Analyse en cours"):
+        self.spinner_chars = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏']
+        self.message = message
+        self.is_running = False
+        self.thread = None
+
+    def spin(self):
+        """Boucle d'animation"""
+        idx = 0
+        while self.is_running:
+            char = self.spinner_chars[idx % len(self.spinner_chars)]
+            sys.stdout.write(f'\r{Colors.GREEN2}{char} {self.message}...{Colors.RESET}')
+            sys.stdout.flush()
+            time.sleep(0.1)
+            idx += 1
+        sys.stdout.write('\r' + ' ' * (len(self.message) + 10) + '\r')
+        sys.stdout.flush()
+
+    def start(self):
+        """Démarre l'animation"""
+        self.is_running = True
+        self.thread = threading.Thread(target=self.spin)
+        self.thread.start()
+
+    def stop(self):
+        """Arrête l'animation"""
+        self.is_running = False
+        if self.thread:
+            self.thread.join()
+
 
 def print_ascii_art():
     art = rf"""
@@ -111,7 +148,28 @@ def run_script(script_name, log_file):
     full_script_path = os.path.join(script_dir, script_name)
 
     if os.path.exists(full_script_path):
-        os.system(f"python \"{full_script_path}\" \"{log_file}\"")
+        spinner = Spinner("Analyse en cours")
+        spinner.start()
+
+        try:
+            result = subprocess.run(
+                ["python", full_script_path, log_file],
+                capture_output=True,
+                text=True,
+                encoding='utf-8',
+                errors='ignore'
+            )
+
+            spinner.stop()
+
+            if result.stdout:
+                print(result.stdout)
+            if result.stderr and result.returncode != 0:
+                print(f"{Colors.GREEN5}{result.stderr}{Colors.RESET}")
+
+        except Exception as e:
+            spinner.stop()
+            print(f"{Colors.GREEN5}[!] Erreur lors de l'exécution: {e}{Colors.RESET}")
     else:
         print(f"{Colors.GREEN5}[!] Script non trouvé: {script_name}{Colors.RESET}")
 
@@ -138,7 +196,28 @@ def run_all_analysis(log_file):
 
         full_script_path = os.path.join(script_dir, script)
         if os.path.exists(full_script_path):
-            os.system(f"python \"{full_script_path}\" \"{log_file}\"")
+            spinner = Spinner(f"Analyse {name}")
+            spinner.start()
+
+            try:
+                result = subprocess.run(
+                    ["python", full_script_path, log_file],
+                    capture_output=True,
+                    text=True,
+                    encoding='utf-8',
+                    errors='ignore'
+                )
+
+                spinner.stop()
+
+                if result.stdout:
+                    print(result.stdout)
+                if result.stderr and result.returncode != 0:
+                    print(f"{Colors.GREEN5}{result.stderr}{Colors.RESET}")
+
+            except Exception as e:
+                spinner.stop()
+                print(f"{Colors.GREEN5}[!] Erreur lors de l'exécution: {e}{Colors.RESET}")
         else:
             print(f"{Colors.GREEN5}[!] Script non trouvé: {script}{Colors.RESET}")
 
