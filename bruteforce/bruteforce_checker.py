@@ -2,6 +2,11 @@ import gzip
 import re
 import sys
 import os
+import io
+
+if sys.platform == 'win32':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 
 log_file = "../calt.log.gz"
 SEUIL_ALERTE = 5
@@ -12,6 +17,8 @@ pending_sequences = {}
 LOGIN_PAGES = r"login|admin|manager|wp-login|author|formLogin|config"
 
 def analyze_bruteforce(file_path):
+    print(f"[DEBUG] Démarrage de l'analyse bruteforce sur {file_path}")
+    sys.stdout.flush()
     total_alerts = 0
 
     script_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -55,11 +62,14 @@ def analyze_bruteforce(file_path):
                             del pending_sequences[ip]
 
         print(f"Analyse bruteforce terminée. Total détecté : {total_alerts}")
+        sys.stdout.flush()
         output_path = os.path.abspath(output_file)
         print(f"Résultats sauvegardés dans : {output_path}")
+        sys.stdout.flush()
 
     except FileNotFoundError:
         print(f"Erreur : Le fichier {file_path} est introuvable.")
+        sys.stdout.flush()
 
 if __name__ == "__main__":
     file_to_analyze = sys.argv[1] if len(sys.argv) > 1 else log_file

@@ -21,9 +21,7 @@ class Colors:
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
-
 class Spinner:
-    """Animation de barre tournante pendant l'exécution des scripts"""
     def __init__(self, message="Analyse en cours"):
         self.spinner_chars = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏']
         self.message = message
@@ -31,7 +29,6 @@ class Spinner:
         self.thread = None
 
     def spin(self):
-        """Boucle d'animation"""
         idx = 0
         while self.is_running:
             char = self.spinner_chars[idx % len(self.spinner_chars)]
@@ -43,17 +40,14 @@ class Spinner:
         sys.stdout.flush()
 
     def start(self):
-        """Démarre l'animation"""
         self.is_running = True
         self.thread = threading.Thread(target=self.spin)
         self.thread.start()
 
     def stop(self):
-        """Arrête l'animation"""
         self.is_running = False
         if self.thread:
             self.thread.join()
-
 
 def print_ascii_art():
     art = rf"""
@@ -116,9 +110,7 @@ def get_log_file():
             print(f"{Colors.GREEN5}[!] Arrêt du programme.{Colors.RESET}")
             sys.exit(0)
 
-
 def ask_display_mode():
-    """Demande à l'utilisateur s'il veut voir tous les logs ou uniquement les réussites"""
     print(f"\n{Colors.GREEN2}╔═══════════════════════════════════════════════════════════════╗{Colors.RESET}")
     print(f"{Colors.GREEN2}║           {Colors.BOLD}TYPE D'AFFICHAGE DES RÉSULTATS{Colors.RESET}{Colors.GREEN2}                      ║{Colors.RESET}")
     print(f"{Colors.GREEN2}╠═══════════════════════════════════════════════════════════════╣{Colors.RESET}")
@@ -133,7 +125,6 @@ def ask_display_mode():
         if choice in ['1', '2']:
             return 'all' if choice == '1' else 'success'
         print(f"{Colors.GREEN5}[!] Choix invalide. Veuillez entrer 1 ou 2.{Colors.RESET}")
-
 
 def display_menu():
     menu = f"""
@@ -174,23 +165,29 @@ def run_script(script_name, log_file, display_mode=None):
         spinner.start()
 
         try:
-            user_input = None
+            cmd = ["python", full_script_path, log_file]
             if display_mode:
-                user_input = 'o\n' if display_mode == 'all' else '\n'
+                cmd.append(display_mode)
+
+            env = os.environ.copy()
+            env['PYTHONIOENCODING'] = 'utf-8'
 
             result = subprocess.run(
-                ["python", full_script_path, log_file],
-                input=user_input,
+                cmd,
                 capture_output=True,
                 text=True,
                 encoding='utf-8',
-                errors='ignore'
+                errors='replace',
+                env=env
             )
 
             spinner.stop()
 
             if result.stdout:
-                print(result.stdout)
+                for line in result.stdout.strip().split('\n'):
+                    if line:
+                        print(line)
+
             if result.stderr and result.returncode != 0:
                 print(f"{Colors.GREEN5}{result.stderr}{Colors.RESET}")
 
@@ -202,23 +199,19 @@ def run_script(script_name, log_file, display_mode=None):
 
     input(f"\n{Colors.GREEN4}Appuyez sur Entrée pour continuer...{Colors.RESET}")
 
-
 def run_interactive_script(script_name, log_file):
-    """Exécute un script qui nécessite une interaction utilisateur (sans subprocess)"""
     print(f"\n{Colors.GREEN3}[*] Exécution de {script_name}...{Colors.RESET}\n")
 
     script_dir = os.path.dirname(os.path.abspath(__file__))
     full_script_path = os.path.join(script_dir, script_name)
 
     if os.path.exists(full_script_path):
-        # Exécuter directement avec os.system pour permettre l'interaction
         command = f'python "{full_script_path}" "{log_file}"'
         os.system(command)
     else:
         print(f"{Colors.GREEN5}[!] Script non trouvé: {script_name}{Colors.RESET}")
 
     input(f"\n{Colors.GREEN4}Appuyez sur Entrée pour continuer...{Colors.RESET}")
-
 
 def run_all_analysis(log_file):
     scripts = [
@@ -234,8 +227,6 @@ def run_all_analysis(log_file):
 
     display_mode = ask_display_mode()
 
-    user_input = 'o\n' if display_mode == 'all' else '\n'
-
     script_dir = os.path.dirname(os.path.abspath(__file__))
 
     for script, name in scripts:
@@ -249,19 +240,27 @@ def run_all_analysis(log_file):
             spinner.start()
 
             try:
+                cmd = ["python", full_script_path, log_file, display_mode]
+
+                env = os.environ.copy()
+                env['PYTHONIOENCODING'] = 'utf-8'
+
                 result = subprocess.run(
-                    ["python", full_script_path, log_file],
-                    input=user_input,
+                    cmd,
                     capture_output=True,
                     text=True,
                     encoding='utf-8',
-                    errors='ignore'
+                    errors='replace',
+                    env=env
                 )
 
                 spinner.stop()
 
                 if result.stdout:
-                    print(result.stdout)
+                    for line in result.stdout.strip().split('\n'):
+                        if line:
+                            print(line)
+
                 if result.stderr and result.returncode != 0:
                     print(f"{Colors.GREEN5}{result.stderr}{Colors.RESET}")
 

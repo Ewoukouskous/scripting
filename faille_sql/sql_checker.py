@@ -2,6 +2,11 @@ import gzip
 import re
 import sys
 import os
+import io
+
+if sys.platform == 'win32':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 
 log_file = "../calt.log.gz"
 
@@ -61,12 +66,16 @@ def analyze_logs(file_path):
                         pass
 
         print(f"Analyse de faille sql terminée.")
+        sys.stdout.flush()
         print(f"Total de tentatives détectées : {total_sqli}")
+        sys.stdout.flush()
         output_path = os.path.abspath(output_file)
         print(f"Résultats sauvegardés dans : {output_path}")
+        sys.stdout.flush()
 
     except FileNotFoundError:
         print("Erreur : Le fichier est introuvable.")
+        sys.stdout.flush()
 
 if __name__ == "__main__":
     file_to_analyze = sys.argv[1] if len(sys.argv) > 1 else log_file
