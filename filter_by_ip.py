@@ -1,42 +1,44 @@
 import time
+import re
 
-file_name = 'full-logs.sorted.txt'
-result = []
+file_name = 'calt.log'
+nombre_logs = 0
 print("-" * 30)
 print("What IP address do you want to filter by ?")
 ip_to_filter = input()
 print("-" * 30)
 
-file_to_write = ip_to_filter.replace('.', '_')
+output_file = ip_to_filter.replace('.', '_')+".txt"
 
 debut = time.perf_counter()
 
-with open(file_name, 'r', encoding='utf-8') as file:
+with open(file_name, 'r', encoding='utf-8') as file, \
+        open(output_file, 'w', encoding='utf-8') as out:
     for line in file:
-        parts = line.split()
+        log_pattern = re.compile(
+            r'(?P<ip>[\d\.]+) - - \[(?P<date>.*?)\] "(?P<request>.*?)" (?P<status>\d+) (?P<size>\d+|-) "(?P<referer>.*?)" "(?P<ua>.*?)"')
+        match = log_pattern.match(line)
+        if match:
+            parts = match.groupdict()
+            # Clean line exemple :
+            # Ip address, Date and time, Request, Status code, Size, User agent
 
-        # Clean line exemple :
-        # Ip address [0], Date and time [1], Request [2], Status code [3], Size [4], User agent [5]
-        clean_line = [
-            parts[0],
-            f"{parts[3]} {parts[4]}".strip('[]'),
-            f"{parts[5]} {parts[6]} {parts[7]}".strip('"'),
-            parts[8],
-            parts[9],
-            " ".join(parts[11:]).strip('"')
-        ]
-        if clean_line[0] == ip_to_filter:
-            result.append(clean_line)
+            ip = parts['ip']
+            timestamp = parts['date']
+            request = parts['request']
+            status = parts['status']
+            size_str = parts['size']
+            referer = parts['referer']
+            log_useragent = parts['ua']
 
+            if ip == ip_to_filter:
+                nombre_logs += 1
+                print(f"{timestamp:<22} | {ip:<15} | {status} | {size_str:<5} | {request} | {log_useragent}", file=out)
 
-with open(file_to_write+".txt", 'w', encoding='utf-8') as file:
-    for line in result:
-        file.write(str(line) + '\n')
 
 fin = time.perf_counter()
 
 duree = fin - debut
-nombre_logs = len(result)
 
 print("-" * 30)
 print(f"Formatage terminé !")

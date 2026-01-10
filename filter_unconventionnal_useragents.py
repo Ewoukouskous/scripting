@@ -1,10 +1,8 @@
 import time
+import re
 
-file_name = 'full-logs.sorted.txt'
-result = []
-print("-" * 30)
-print("What name do you want to give to your writed file ?")
-file_to_write = input()
+file_name = 'calt.log'
+output_file = 'unconventional_userAgents_positive_logs.txt'
 print("-" * 30)
 
 
@@ -19,36 +17,55 @@ conventionnal_useragent = [
     "Dart"
 ]
 
+full_logs = False
+print("Souhaitez vous l'intégralité des logs avec user agents non conventionnels ? (REPONSE SERVEUR POSITIVE et NEGATIVE) [o/N] :")
+choice = input().strip().lower()
+if choice == 'o':
+    full_logs = True
+    output_file = 'unconventional_userAgents_all_logs.txt'
+
 debut = time.perf_counter()
+nombre_logs = 0
+nombre_logs_positif = 0
 
-with open(file_name, 'r', encoding='utf-8') as file:
+with open(file_name, 'r', encoding='utf-8') as file, \
+        open(output_file, 'w', encoding='utf-8') as out:
     for line in file:
-        parts = line.split()
+        log_pattern = re.compile(r'(?P<ip>[\d\.]+) - - \[(?P<date>.*?)\] "(?P<request>.*?)" (?P<status>\d+) (?P<size>\d+|-) "(?P<referer>.*?)" "(?P<ua>.*?)"')
+        match = log_pattern.match(line)
+        if match :
+            parts = match.groupdict()
+            # Clean line exemple :
+            # Ip address, Date and time, Request, Status code, Size, User agent
 
-        # Clean line exemple :
-        # Ip address [0], Date and time [1], Request [2], Status code [3], Size [4], User agent [5]
-        clean_line = [
-            parts[0],
-            f"{parts[3]} {parts[4]}".strip('[]'),
-            f"{parts[5]} {parts[6]} {parts[7]}".strip('"'),
-            parts[8],
-            parts[9],
-            " ".join(parts[11:]).strip('"')
-        ]
-        if not any(useragent.lower() in clean_line[5].lower() for useragent in conventionnal_useragent):
-            result.append(clean_line)
+            ip = parts['ip']
+            timestamp = parts['date']
+            request = parts['request']
+            status = parts['status']
+            size_str = parts['size']
+            referer = parts['referer']
+            log_useragent = parts['ua']
 
-with open(file_to_write+".txt", 'w', encoding='utf-8') as file:
-    for line in result:
-        file.write(str(line) + '\n')
+            # If user agent is not conventionnal and status code is 2xx, 301 or 302
+            if not any(useragent.lower() in log_useragent.lower() for useragent in conventionnal_useragent):
+                if status.startswith('2') or status in ['301', '302']:
+                    nombre_logs += 1
+                    nombre_logs_positif += 1
+                    print(f"{"[REPONSE SERVEUR POSITIVE]":<20} | {timestamp:<22} | {ip:<15} | {status} | {size_str:<5} | {request} | {log_useragent}", file=out)
+                # If the user agent is not conventionnal but the status code is 4xx
+                if full_logs:
+                    if status.startswith('4'):
+                        nombre_logs += 1
+                        print(f"{"[REPONSE SERVEUR NEGATIVE]":<20} | {timestamp:<22} | {ip:<15} | {status} | {size_str:<5} | {request} | {log_useragent}", file=out)
+
 
 fin = time.perf_counter()
 
 duree = fin - debut
-nombre_logs = len(result)
 
 print("-" * 30)
 print(f"Formatage terminé !")
 print(f"Logs écrit   : {nombre_logs}")
+print(f"Logs positifs: {nombre_logs_positif}")
 print(f"Temps écoulé   : {duree:.4f} secondes")
 print("-" * 30)
