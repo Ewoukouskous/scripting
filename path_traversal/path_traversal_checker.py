@@ -32,8 +32,12 @@ def analyze_traversal(file_path, full_logs=False):
     output_file = os.path.join(results_dir, "path_traversal_logs.txt")
 
     try:
-        with gzip.open(file_path, 'rt', encoding='utf-8', errors='ignore') as f, \
-                open(output_file, 'w', encoding='utf-8') as out:
+        if file_path.endswith('.gz'):
+            f = gzip.open(file_path, 'rt', encoding='utf-8', errors='ignore')
+        else:
+            f = open(file_path, 'r', encoding='utf-8', errors='ignore')
+
+        with f, open(output_file, 'w', encoding='utf-8') as out:
             for line in f:
                 parts = re.split(r'\s(?=(?:[^"]*"[^"]*")*[^"]*$)', line)
                 if len(parts) < 7:

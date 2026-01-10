@@ -34,8 +34,12 @@ def analyze_xss(file_path):
     sys.stdout.flush()
 
     try:
-        with gzip.open(file_path, 'rt', encoding='utf-8', errors='ignore') as f, \
-                open(output_file, 'w', encoding='utf-8') as out:
+        if file_path.endswith('.gz'):
+            f = gzip.open(file_path, 'rt', encoding='utf-8', errors='ignore')
+        else:
+            f = open(file_path, 'r', encoding='utf-8', errors='ignore')
+
+        with f, open(output_file, 'w', encoding='utf-8') as out:
             for line in f:
                 parts = line.split()
                 if len(parts) < 9: continue

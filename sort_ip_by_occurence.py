@@ -3,6 +3,11 @@ import re
 import sys
 import os
 import gzip
+import io
+
+if sys.platform == 'win32':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 
 file_name = sys.argv[1] if len(sys.argv) > 1 else 'calt.log'
 result = []
@@ -22,31 +27,27 @@ ips = {}
 
 debut = time.perf_counter()
 
-with open(file_name, 'r', encoding='utf-8') as file:
-    for line in file:
-        log_pattern = re.compile(
-            r'(?P<ip>[\d\.]+) - - \[(?P<date>.*?)\] "(?P<request>.*?)" (?P<status>\d+) (?P<size>\d+|-) "(?P<referer>.*?)" "(?P<ua>.*?)"')
+log_pattern = re.compile(
+    r'(?P<ip>[\d\.]+) - - \[(?P<date>.*?)\] "(?P<request>.*?)" (?P<status>\d+) (?P<size>\d+|-) "(?P<referer>.*?)" "(?P<ua>.*?)"')
+
+if file_name.endswith('.gz'):
+    file_handle = gzip.open(file_name, 'rt', encoding='utf-8', errors='ignore')
+else:
+    file_handle = open(file_name, 'r', encoding='utf-8', errors='ignore')
+
+try:
+    for line in file_handle:
         match = log_pattern.match(line)
         if match:
             parts = match.groupdict()
-            # Clean line exemple :
-            # Ip address, Date and time, Request, Status code, Size, User agent
-
             ip = parts['ip']
-            timestamp = parts['date']
-            request = parts['request']
-            status = parts['status']
-            size_str = parts['size']
-            referer = parts['referer']
-            log_useragent = parts['ua']
 
-        if ip in ips:
-            ips[ip] += 1
-        else:
-            ips[ip] = 1
+            if ip in ips:
+                ips[ip] += 1
+            else:
+                ips[ip] = 1
 finally:
-    if file_handle:
-        file_handle.close()
+    file_handle.close()
 
 for ip, count in ips.items():
     if count > 2 :
