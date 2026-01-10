@@ -21,13 +21,11 @@ output_file = os.path.join(results_dir, f"{file_to_write}.txt")
 
 debut = time.perf_counter()
 
-# Essayer gzip d'abord, puis fichier texte avec gestion robuste des erreurs
 file_handle = None
 is_gzip = False
 
 try:
     file_handle = gzip.open(file_name, 'rt', encoding='utf-8', errors='ignore')
-    # Tester si c'est vraiment un gzip en lisant une ligne
     file_handle.readline()
     file_handle.seek(0)
     is_gzip = True
