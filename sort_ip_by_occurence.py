@@ -1,16 +1,37 @@
 import time
 import re
+import sys
+import os
+import gzip
+import io
 
-file_name = 'calt.log'
+if sys.platform == 'win32':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
+
+file_name = sys.argv[1] if len(sys.argv) > 1 else 'calt.log'
+script_dir = os.path.dirname(os.path.abspath(__file__))
+results_dir = os.path.join(script_dir, 'results')
+if not os.path.exists(results_dir):
+    os.makedirs(results_dir)
+
+output_file = os.path.join(results_dir, "ip_sorted_by_occurrence.txt")
+
 result = []
 ips = {}
 
 start = time.perf_counter()
 
-with open(file_name, 'r', encoding='utf-8') as file:
-    for line in file:
-        log_pattern = re.compile(
-            r'(?P<ip>[\d\.]+) - - \[(?P<date>.*?)\] "(?P<request>.*?)" (?P<status>\d+) (?P<size>\d+|-) "(?P<referer>.*?)" "(?P<ua>.*?)"')
+log_pattern = re.compile(
+    r'(?P<ip>[\d\.]+) - - \[(?P<date>.*?)\] "(?P<request>.*?)" (?P<status>\d+) (?P<size>\d+|-) "(?P<referer>.*?)" "(?P<ua>.*?)"')
+
+if file_name.endswith('.gz'):
+    file_handle = gzip.open(file_name, 'rt', encoding='utf-8', errors='ignore')
+else:
+    file_handle = open(file_name, 'r', encoding='utf-8', errors='ignore')
+
+try:
+    for line in file_handle:
         match = log_pattern.match(line)
         if match:
             parts = match.groupdict()
@@ -18,17 +39,13 @@ with open(file_name, 'r', encoding='utf-8') as file:
             # Ip address, Date and time, Request, Status code, Size, User agent
 
             ip = parts['ip']
-            timestamp = parts['date']
-            request = parts['request']
-            status = parts['status']
-            size_str = parts['size']
-            referer = parts['referer']
-            log_useragent = parts['ua']
 
-        if ip in ips:
-            ips[ip] += 1
-        else:
-            ips[ip] = 1
+            if ip in ips:
+                ips[ip] += 1
+            else:
+                ips[ip] = 1
+finally:
+    file_handle.close()
 
 for ip, count in ips.items():
     if count > 2 :
@@ -37,7 +54,7 @@ for ip, count in ips.items():
 result.sort(key=lambda x: x[1], reverse=True)
 
 
-with open("ip_sorted_by_occurrence.txt", 'w', encoding='utf-8') as file:
+with open(output_file, 'w', encoding='utf-8') as file:
     for line in result:
         file.write(str(line) + '\n')
 
@@ -50,4 +67,5 @@ print("-" * 30)
 print(f"Formatage terminé !")
 print(f"Logs écrit   : {number_logs}")
 print(f"Temps écoulé   : {duration:.4f} secondes")
+print(f"Résultats sauvegardés dans : {os.path.abspath(output_file)}")
 print("-" * 30)
