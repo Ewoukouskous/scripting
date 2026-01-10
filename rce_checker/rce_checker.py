@@ -15,6 +15,11 @@ rce_patterns = [
 regex_rce = re.compile("|".join(rce_patterns), re.IGNORECASE)
 
 def analyze_rce(file_path):
+    full_logs = False
+    print("Souhaitez vous l'intégralité des tentatives de RCE découverte ? (SUSPECTE et REUSSIES) [o/N] :")
+    choice = input().strip().lower()
+    if choice == 'o':
+        full_logs = True
     success_count = 0
     total_rce = 0
 
@@ -37,13 +42,13 @@ def analyze_rce(file_path):
                     total_rce += 1
 
                     is_success = status.startswith('2')
-                    prefix = "[SUCCESS]" if is_success else "[ATTEMPT]"
+                    prefix = "[REUSSIE]" if is_success else "[SUSPECT/TENTATIVE]"
 
                     if is_success:
                         success_count += 1
-                        print(f"{prefix:<12} | {timestamp:<22} | {ip:<15} | {status} | {size_str:<5} | {request}", file=out)
-                    else:
-                        pass
+                        print(f"{prefix:<20} | {timestamp:<22} | {ip:<15} | {status} | {size_str:<5} | {request}", file=out)
+                    elif full_logs:
+                        print(f"{prefix:<20} | {timestamp:<22} | {ip:<15} | {status} | {size_str:<5} | {request}", file=out)
 
         print(f"Analyse d'attaque rce terminée")
         print(f"Total de tentatives RCE détectées : {total_rce}")
