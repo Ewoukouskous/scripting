@@ -5,7 +5,7 @@ file_name = 'calt.log'
 result = []
 ips = {}
 
-debut = time.perf_counter()
+start = time.perf_counter()
 
 with open(file_name, 'r', encoding='utf-8') as file:
     for line in file:
@@ -41,13 +41,13 @@ with open("ip_sorted_by_occurrence.txt", 'w', encoding='utf-8') as file:
     for line in result:
         file.write(str(line) + '\n')
 
-fin = time.perf_counter()
+end = time.perf_counter()
 
-duree = fin - debut
-nombre_logs = len(result)
+duration = end - start
+number_logs = len(result)
 
 print("-" * 30)
 print(f"Formatage terminé !")
-print(f"Logs écrit   : {nombre_logs}")
-print(f"Temps écoulé   : {duree:.4f} secondes")
+print(f"Logs écrit   : {number_logs}")
+print(f"Temps écoulé   : {duration:.4f} secondes")
 print("-" * 30)
