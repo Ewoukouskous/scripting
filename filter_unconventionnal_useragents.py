@@ -11,14 +11,14 @@ if sys.platform == 'win32':
 
 file_name = sys.argv[1] if len(sys.argv) > 1 else 'calt.log'
 
-file_to_write = 'unconventional_userAgents_positive_logs.txt'
+file_to_write = 'unconventional_userAgents_positive_logs'
 
 full_logs = False
 print("Souhaitez vous l'intégralité des logs avec user agents non conventionnels ? (REPONSE SERVEUR POSITIVE et NEGATIVE) [o/N] :")
 choice = input().strip().lower()
 if choice == 'o':
     full_logs = True
-    output_file = 'unconventional_userAgents_all_logs.txt'
+    file_to_write = 'unconventional_userAgents_all_logs'
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 results_dir = os.path.join(script_dir, 'results')
