@@ -22,28 +22,23 @@ ips = {}
 
 debut = time.perf_counter()
 
-file_handle = None
-is_gzip = False
+with open(file_name, 'r', encoding='utf-8') as file:
+    for line in file:
+        log_pattern = re.compile(
+            r'(?P<ip>[\d\.]+) - - \[(?P<date>.*?)\] "(?P<request>.*?)" (?P<status>\d+) (?P<size>\d+|-) "(?P<referer>.*?)" "(?P<ua>.*?)"')
+        match = log_pattern.match(line)
+        if match:
+            parts = match.groupdict()
+            # Clean line exemple :
+            # Ip address, Date and time, Request, Status code, Size, User agent
 
-try:
-    file_handle = gzip.open(file_name, 'rt', encoding='utf-8', errors='ignore')
-    file_handle.readline()
-    file_handle.seek(0)
-    is_gzip = True
-except (gzip.BadGzipFile, OSError):
-    pass
-
-if not is_gzip:
-    file_handle = open(file_name, 'r', encoding='utf-8', errors='ignore')
-
-try:
-    for line in file_handle:
-        parts = re.split(r'\s(?=(?:[^"]*"[^"]*")*[^"]*$)', line)
-
-        if len(parts) < 1:
-            continue
-
-        ip = parts[0]
+            ip = parts['ip']
+            timestamp = parts['date']
+            request = parts['request']
+            status = parts['status']
+            size_str = parts['size']
+            referer = parts['referer']
+            log_useragent = parts['ua']
 
         if ip in ips:
             ips[ip] += 1

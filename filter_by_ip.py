@@ -2,6 +2,7 @@ import time
 import sys
 import os
 import gzip
+import re
 
 file_name = sys.argv[1] if len(sys.argv) > 1 else 'full-logs.sorted.txt'
 result = []
@@ -10,7 +11,7 @@ print("What IP address do you want to filter by ?")
 ip_to_filter = input()
 print("-" * 30)
 
-file_to_write = ip_to_filter.replace('.', '_')
+output_file = ip_to_filter.replace('.', '_')+".txt"
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 results_dir = os.path.join(script_dir, 'results')
@@ -21,45 +22,29 @@ output_file = os.path.join(results_dir, f"{file_to_write}.txt")
 
 debut = time.perf_counter()
 
-file_handle = None
-is_gzip = False
+with open(file_name, 'r', encoding='utf-8') as file, \
+        open(output_file, 'w', encoding='utf-8') as out:
+    for line in file:
+        log_pattern = re.compile(
+            r'(?P<ip>[\d\.]+) - - \[(?P<date>.*?)\] "(?P<request>.*?)" (?P<status>\d+) (?P<size>\d+|-) "(?P<referer>.*?)" "(?P<ua>.*?)"')
+        match = log_pattern.match(line)
+        if match:
+            parts = match.groupdict()
+            # Clean line exemple :
+            # Ip address, Date and time, Request, Status code, Size, User agent
 
-try:
-    file_handle = gzip.open(file_name, 'rt', encoding='utf-8', errors='ignore')
-    file_handle.readline()
-    file_handle.seek(0)
-    is_gzip = True
-except (gzip.BadGzipFile, OSError):
-    pass
+            ip = parts['ip']
+            timestamp = parts['date']
+            request = parts['request']
+            status = parts['status']
+            size_str = parts['size']
+            referer = parts['referer']
+            log_useragent = parts['ua']
 
-if not is_gzip:
-    file_handle = open(file_name, 'r', encoding='utf-8', errors='ignore')
+            if ip == ip_to_filter:
+                nombre_logs += 1
+                print(f"{timestamp:<22} | {ip:<15} | {status} | {size_str:<5} | {request} | {log_useragent}", file=out)
 
-try:
-    for line in file_handle:
-        parts = line.split()
-
-        if len(parts) < 12:
-            continue
-
-        clean_line = [
-            parts[0],
-            f"{parts[3]} {parts[4]}".strip('[]'),
-            f"{parts[5]} {parts[6]} {parts[7]}".strip('"'),
-            parts[8],
-            parts[9],
-            " ".join(parts[11:]).strip('"')
-        ]
-        if clean_line[0] == ip_to_filter:
-            result.append(clean_line)
-finally:
-    if file_handle:
-        file_handle.close()
-
-
-with open(output_file, 'w', encoding='utf-8') as file:
-    for line in result:
-        file.write(str(line) + '\n')
 
 fin = time.perf_counter()
 
