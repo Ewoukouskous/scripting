@@ -17,8 +17,6 @@ pending_sequences = {}
 LOGIN_PAGES = r"login|admin|manager|wp-login|author|formLogin|config"
 
 def analyze_bruteforce(file_path):
-    print(f"[DEBUG] Démarrage de l'analyse bruteforce sur {file_path}")
-    sys.stdout.flush()
     total_alerts = 0
 
     script_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

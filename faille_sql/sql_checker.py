@@ -66,8 +66,6 @@ def analyze_logs(file_path):
                     if is_success:
                         success_count += 1
                         print(f"{prefix:<12} | {timestamp:<22} | {ip:<15} | {status} | {size_str:<5} | {request}", file=out)
-                    else:
-                        pass
 
         print(f"Analyse de faille sql terminée.")
         sys.stdout.flush()

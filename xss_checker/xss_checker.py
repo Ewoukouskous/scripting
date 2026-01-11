@@ -30,8 +30,6 @@ def analyze_xss(file_path):
 
     output_file = os.path.join(results_dir, "xss_detector_logs.txt")
 
-    print(f"[DEBUG] Ouverture du fichier {file_path}")
-    sys.stdout.flush()
 
     try:
         if file_path.endswith('.gz'):

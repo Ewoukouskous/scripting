@@ -47,6 +47,7 @@ try:
 finally:
     file_handle.close()
 
+result = []
 for ip, count in ips.items():
     if count > 2 :
         result.append((ip, count))

@@ -19,8 +19,6 @@ traversal_patterns = [
 regex_traversal = re.compile("|".join(traversal_patterns), re.IGNORECASE)
 
 def analyze_traversal(file_path, full_logs=False):
-    print(f"[DEBUG] Démarrage de l'analyse path traversal sur {file_path} (mode: {'all' if full_logs else 'success only'})")
-    sys.stdout.flush()
     total_found = 0
     critical_hits = 0
 

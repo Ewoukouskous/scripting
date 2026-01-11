@@ -38,7 +38,6 @@ conventional_useragent = [
     "Dart"
 ]
 
-
 start = time.perf_counter()
 number_logs = 0
 number_positive_logs = 0
@@ -72,8 +71,8 @@ with file_handle, open(output_file, 'w', encoding='utf-8') as out:
                     number_logs += 1
                     number_positive_logs += 1
                     print(f"{"[REPONSE SERVEUR POSITIVE]":<20} | {timestamp:<22} | {ip:<15} | {status} | {size_str:<5} | {request} | {log_useragent}", file=out)
-                # If the user agent is not conventional but the status code is 4xx
                 if full_logs:
+                # If the user agent is not conventional but the status code is 4xx
                     if status.startswith('4'):
                         number_logs += 1
                         print(f"{"[REPONSE SERVEUR NEGATIVE]":<20} | {timestamp:<22} | {ip:<15} | {status} | {size_str:<5} | {request} | {log_useragent}", file=out)
