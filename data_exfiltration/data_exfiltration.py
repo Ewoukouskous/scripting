@@ -10,9 +10,16 @@ if sys.platform == 'win32':
 
 log_file = "../calt.log.gz"
 
-LIMITE_EXFIL = 3000000
 
-def analyze_exfiltration(file_path):
+def analyze_exfiltration(file_path, limite_exfil=None):
+    if limite_exfil is None:
+        limite_exfil = 3000000
+
+    threshold_label = f"{limite_exfil / 1000000} Mo"
+
+    print(f"\n[*] Analyse avec seuil : {threshold_label}")
+    sys.stdout.flush()
+
     total_suspicious = 0
 
     script_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -46,17 +53,15 @@ def analyze_exfiltration(file_path):
                 except ValueError:
                     size = 0
 
-                if status == '200' and size > LIMITE_EXFIL:
+                if status == '200' and size > limite_exfil:
                     total_suspicious += 1
                     size_kb = round(size / 1024, 2)
 
                     print(f"[EXFIL] | {timestamp:<22} | {ip:<15} | {status} | {size_kb:<12} | {request}", file=out)
-                else:
-                    pass
 
         print(f"Analyse d'exfiltration terminée")
         sys.stdout.flush()
-        print(f"Nombre de transferts lourds détectés (> {LIMITE_EXFIL / 1000000} Mo) : {total_suspicious}")
+        print(f"Nombre de transferts lourds détectés (> {threshold_label}) : {total_suspicious}")
         sys.stdout.flush()
         output_path = os.path.abspath(output_file)
         print(f"Résultats sauvegardés dans : {output_path}")
@@ -68,4 +73,5 @@ def analyze_exfiltration(file_path):
 
 if __name__ == "__main__":
     file_to_analyze = sys.argv[1] if len(sys.argv) > 1 else log_file
-    analyze_exfiltration(file_to_analyze)
+    threshold = int(sys.argv[2]) if len(sys.argv) > 2 else None
+    analyze_exfiltration(file_to_analyze, threshold)

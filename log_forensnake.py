@@ -126,6 +126,31 @@ def ask_display_mode():
             return 'all' if choice == '1' else 'success'
         print(f"{Colors.GREEN5}[!] Choix invalide. Veuillez entrer 1 ou 2.{Colors.RESET}")
 
+def ask_exfil_threshold():
+    print(f"\n{Colors.GREEN2}╔═══════════════════════════════════════════════════════════════╗{Colors.RESET}")
+    print(f"{Colors.GREEN2}║             {Colors.BOLD}SEUIL DE DÉTECTION D'EXFILTRATION{Colors.RESET}{Colors.GREEN2}                 ║{Colors.RESET}")
+    print(f"{Colors.GREEN2}╠═══════════════════════════════════════════════════════════════╣{Colors.RESET}")
+    print(f"{Colors.GREEN2}║                                                               ║{Colors.RESET}")
+    print(f"{Colors.GREEN2}║  {Colors.GREEN1}[1]{Colors.GREEN3} 1 Mo   (1 000 000 octets)   - Très sensible              ║{Colors.RESET}")
+    print(f"{Colors.GREEN2}║  {Colors.GREEN1}[2]{Colors.GREEN3} 3 Mo   (3 000 000 octets)   - Sensible (défaut)          ║{Colors.RESET}")
+    print(f"{Colors.GREEN2}║  {Colors.GREEN1}[3]{Colors.GREEN3} 5 Mo   (5 000 000 octets)   - Modéré                     ║{Colors.RESET}")
+    print(f"{Colors.GREEN2}║  {Colors.GREEN1}[4]{Colors.GREEN3} 10 Mo  (10 000 000 octets)  - Peu sensible               ║{Colors.RESET}")
+    print(f"{Colors.GREEN2}║                                                               ║{Colors.RESET}")
+    print(f"{Colors.GREEN2}╚═══════════════════════════════════════════════════════════════╝{Colors.RESET}")
+
+    while True:
+        choice = input(f"{Colors.GREEN2}[>] Votre choix (1-4): {Colors.RESET}").strip()
+        if choice == '1':
+            return 1000000
+        elif choice == '2':
+            return 3000000
+        elif choice == '3':
+            return 5000000
+        elif choice == '4':
+            return 10000000
+        else:
+            print(f"{Colors.GREEN5}[!] Choix invalide. Veuillez entrer un chiffre entre 1 et 4.{Colors.RESET}")
+
 def display_menu():
     menu = f"""
 {Colors.GREEN2}╔═══════════════════════════════════════════════════════════════╗
@@ -155,9 +180,14 @@ def run_script(script_name, log_file, display_mode=None):
     print(f"\n{Colors.GREEN3}[*] Exécution de {script_name}...{Colors.RESET}\n")
 
     needs_mode = 'path_traversal/' in script_name or 'rce_checker/' in script_name
+    needs_threshold = 'data_exfiltration/' in script_name
 
     if display_mode is None and needs_mode:
         display_mode = ask_display_mode()
+
+    threshold = None
+    if needs_threshold:
+        threshold = ask_exfil_threshold()
 
     script_dir = os.path.dirname(os.path.abspath(__file__))
     full_script_path = os.path.join(script_dir, script_name)
@@ -170,6 +200,8 @@ def run_script(script_name, log_file, display_mode=None):
             cmd = ["python", full_script_path, log_file]
             if display_mode:
                 cmd.append(display_mode)
+            if threshold:
+                cmd.append(str(threshold))
 
             env = os.environ.copy()
             env['PYTHONIOENCODING'] = 'utf-8'
@@ -230,6 +262,9 @@ def run_all_analysis(log_file):
     print(f"{Colors.GREEN3}[i] Mode d'affichage pour Path Traversal et RCE :{Colors.RESET}")
     display_mode = ask_display_mode()
 
+    print(f"\n{Colors.GREEN3}[i] Seuil de détection pour l'Exfiltration de données :{Colors.RESET}")
+    exfil_threshold = ask_exfil_threshold()
+
     script_dir = os.path.dirname(os.path.abspath(__file__))
 
     for script, name in scripts:
@@ -247,6 +282,9 @@ def run_all_analysis(log_file):
 
                 if 'path_traversal/' in script or 'rce_checker/' in script:
                     cmd.append(display_mode)
+
+                if 'data_exfiltration/' in script:
+                    cmd.append(str(exfil_threshold))
 
                 env = os.environ.copy()
                 env['PYTHONIOENCODING'] = 'utf-8'
