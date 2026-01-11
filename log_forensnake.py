@@ -72,6 +72,10 @@ def print_ascii_art():
 {Colors.BOLD}{Colors.GREEN1}  ╦  ╔═╗╔═╗  {Colors.GREEN2}╔═╗╔═╗╦═╗╔═╗╔╗╔{Colors.GREEN3}╔═╗╔╗╔╔═╗╦╔═╔═╗
 {Colors.BOLD}{Colors.GREEN1}  ║  ║ ║║ ╦  {Colors.GREEN2}╠╣ ║ ║╠╦╝║╣ ║║║{Colors.GREEN3}╚═╗║║║╠═╣╠╩╗║╣ 
 {Colors.BOLD}{Colors.GREEN1}  ╩═╝╚═╝╚═╝  {Colors.GREEN2}╚  ╚═╝╩╚═╚═╝╝╚╝{Colors.GREEN3}╚═╝╝╚╝╩ ╩╩ ╩╚═╝
+
+
+{Colors.BOLD}{Colors.GREEN1} Made by:
+{Colors.BOLD}{Colors.GREEN1} @Ewoukouskous {Colors.GREEN2} @RAmiard
 {Colors.RESET}
 {Colors.GREEN3}═══════════════════════════════════════════════════════════════
 {Colors.GREEN4}        Outil de Forensic pour l'Analyse de Logs Apache
