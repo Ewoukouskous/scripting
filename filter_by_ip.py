@@ -26,6 +26,8 @@ start = time.perf_counter()
 output_file = os.path.join(results_dir, f"{file_to_write}.txt")
 number_logs = 0
 
+print(f"Recherche en cours pour l'IP : {ip_to_filter}...")
+sys.stdout.flush()
 
 log_pattern = re.compile(
     r'(?P<ip>[\d\.]+) - - \[(?P<date>.*?)\] "(?P<request>.*?)" (?P<status>\d+) (?P<size>\d+|-) "(?P<referer>.*?)" "(?P<ua>.*?)"')
@@ -60,10 +62,12 @@ end = time.perf_counter()
 
 duration = end - start
 
+print(f"Recherche terminée pour l'IP : {ip_to_filter}")
+sys.stdout.flush()
 print("-" * 30)
-print(f"Formatage terminé !")
-print(f"Logs écrit   : {number_logs}")
-print(f"Temps écoulé   : {duration:.4f} secondes")
+print(f"Filtrage terminé !")
+print(f"Logs trouvés : {number_logs}")
+print(f"Temps écoulé : {duration:.4f} secondes")
 print(f"Résultats sauvegardés dans : {os.path.abspath(output_file)}")
 print("-" * 30)
 sys.stdout.flush()
