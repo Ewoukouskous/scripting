@@ -69,9 +69,9 @@ def print_ascii_art():
 {Colors.GREEN5}             ~-_           _-~          ~-_       _-~
 {Colors.GREEN5}                ~--______-~                ~-___-~
 
-{Colors.BOLD}{Colors.GREEN1}  ╦  ╔═╗╔═╗  {Colors.GREEN2}╔═╗╔═╗╦═╗╔═╗╔╗╔{Colors.GREEN3}╔═╗╔╗╔╔═╗╦╔═╔═╗
-{Colors.BOLD}{Colors.GREEN1}  ║  ║ ║║ ╦  {Colors.GREEN2}╠╣ ║ ║╠╦╝║╣ ║║║{Colors.GREEN3}╚═╗║║║╠═╣╠╩╗║╣ 
-{Colors.BOLD}{Colors.GREEN1}  ╩═╝╚═╝╚═╝  {Colors.GREEN2}╚  ╚═╝╩╚═╚═╝╝╚╝{Colors.GREEN3}╚═╝╝╚╝╩ ╩╩ ╩╚═╝
+{Colors.BOLD}{Colors.GREEN1}            ╦  ╔═╗╔═╗  {Colors.GREEN2}╔═╗╔═╗╦═╗╔═╗╔╗╔{Colors.GREEN3}╔═╗╔╗╔╔═╗╦╔═╔═╗
+{Colors.BOLD}{Colors.GREEN1}            ║  ║ ║║ ╦  {Colors.GREEN2}╠╣ ║ ║╠╦╝║╣ ║║║{Colors.GREEN3}╚═╗║║║╠═╣╠╩╗║╣ 
+{Colors.BOLD}{Colors.GREEN1}            ╩═╝╚═╝╚═╝  {Colors.GREEN2}╚  ╚═╝╩╚═╚═╝╝╚╝{Colors.GREEN3}╚═╝╝╚╝╩ ╩╩ ╩╚═╝
 
 
 {Colors.BOLD}{Colors.GREEN1} Made by:
