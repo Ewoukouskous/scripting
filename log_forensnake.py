@@ -154,7 +154,9 @@ def display_menu():
 def run_script(script_name, log_file, display_mode=None):
     print(f"\n{Colors.GREEN3}[*] Exécution de {script_name}...{Colors.RESET}\n")
 
-    if display_mode is None and any(x in script_name for x in ['bruteforce', 'sql', 'path_traversal', 'xss', 'rce', 'data_exfiltration']):
+    needs_mode = 'path_traversal/' in script_name or 'rce_checker/' in script_name
+
+    if display_mode is None and needs_mode:
         display_mode = ask_display_mode()
 
     script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -225,6 +227,7 @@ def run_all_analysis(log_file):
 
     print(f"\n{Colors.GREEN2}[*] Démarrage de l'analyse complète...{Colors.RESET}\n")
 
+    print(f"{Colors.GREEN3}[i] Mode d'affichage pour Path Traversal et RCE :{Colors.RESET}")
     display_mode = ask_display_mode()
 
     script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -240,7 +243,10 @@ def run_all_analysis(log_file):
             spinner.start()
 
             try:
-                cmd = ["python", full_script_path, log_file, display_mode]
+                cmd = ["python", full_script_path, log_file]
+
+                if 'path_traversal/' in script or 'rce_checker/' in script:
+                    cmd.append(display_mode)
 
                 env = os.environ.copy()
                 env['PYTHONIOENCODING'] = 'utf-8'
